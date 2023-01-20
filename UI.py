@@ -1,6 +1,5 @@
 import os
 import SmartController as sc
-from SmartController import SimpleUI
 from test import Start
 
 import dill as pickle
@@ -27,7 +26,11 @@ from kivy.config import Config
 from Gestures import Gesture
 import handLandmarks as hl
 
+from UIMain import SimpleUI
+
 from Tools import Cartoonizer
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 Config.set('graphics', 'resizable', True)
@@ -57,11 +60,12 @@ class Main(Screen):
 
         start.run_main()
 
-    def new_gesture(self,name):
+    def new_gesture(self,name,new=True):
         cap = cv2.VideoCapture(0)
         detector = hl.handDetector()
         done = 0
-        ges = Gesture(name=name)
+        ges = Gesture(name=name, new=new)
+        ges.create_directory()
         print(name)
 
         while True:
@@ -78,43 +82,36 @@ class Main(Screen):
                 '''
 
                 if done == 0:
-                    img = SimpleUI().add_text(img, "Present the Gesture")
+                    #img = SimpleUI().add_text(img, "Present the Gesture")
+                    cv2.putText(img, 'Present the Gesture', (20, 120),
+                                cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 100, 0), 2)
                     done = ges.create_gesture(detector)
                     print('positive sampling')
 
                 if done == -1:
-                    done = ges.create_gesture(detector)
-                    img = SimpleUI().add_text(img, "do different gestures")
-                    print('negative sampling')
+                    ges.copy_negatives()
+                    ges.train_model()
+                    done=1
+                    # done = ges.create_gesture(detector)
+                    # #img = SimpleUI().add_text(img, "do different gestures")
+                    # cv2.putText(img, 'Do diffeernet gestures', (20, 120),
+                    #             cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 100, 0), 2)
+                    # print('negative sampling')
 
                 # the process is finished, and gesture is created
                 if done == 1:
-                    img = SimpleUI().add_text(img, 'lets try the gesture')
-                    if ges.check_ges(detector):
-                        success, img = cap.read()
-                        img = cv2.flip(img, 1)
-                        img = SimpleUI().add_text(img, 'gesture added succecfully')
+                    cv2.imwrite(ROOT_DIR + '/datasets' + str(name) + '.jpg', img)
+                    print('gesture added succesfully')
 
-                        gesture, mask = detector.broad_isolate_hand(img, handedness)
-                        #cartoon = Cartoonizer()
-                        #res = cartoon.render(gesture)
-
-                        cv2.imshow('gesture', gesture)
-                        #cv2.imshow('cartton', res)
-                        cv2.imwrite('/home/yaron/PycharmProjects/SmartController/images/ges_images/' + str(name) + '.jpg', gesture)
-                        cv2.waitKey(0)
-
-
-                        img = SimpleUI().add_text(img, org=(50, 100), text='press any key to continue')
-                        cv2.imshow('img', img)
-                        print('hooray')
+                    cv2.imshow('img', img)
+                    print('hooray')
 
 
 
 
-                        cv2.waitKey(0)
-                        cv2.destroyWindow('img')
-                        break
+                    cv2.waitKey(0)
+                    cv2.destroyWindow('img')
+                    break
 
                     # else: print ('nope')
 

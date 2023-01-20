@@ -267,17 +267,29 @@ class handDetector():
     
         return angle
 
+    def angle_between(self,p1, p2):
+
+        hp1= (self.lmList[p1][1], self.lmList[p1][2])
+        hp2 = (self.lmList[p2][1], self.lmList[p2][2])
+
+        ang1 = np.arctan2(*hp1[::-1])
+        ang2 = np.arctan2(*hp2[::-1])
+        return np.rad2deg((ang1 - ang2))
+
     def pointAngle(self, p1,p2, with_x_axis=True):
         #a = self.tipIds[finger]
 
         if self.hand == 'Right':
-            y = abs(self.lmList[p1][2] - self.lmList[p2][2])
-            x = abs(self.lmList[p1][1] - self.lmList[p2][1])
+            y = self.lmList[p1][2] - self.lmList[p2][2]
+            x = self.lmList[p1][1] - self.lmList[p2][1]
         elif self.hand == 'Left':
             y = abs(self.lmListLeft[p1][2] - self.lmListLeft[p2][2])
             x = abs(self.lmListLeft[p1][1] - self.lmListLeft[p2][1])
         else:
             x, y = 0, 0
+
+
+
 
         h = math.sqrt(y ** 2 + x ** 2)
 
@@ -495,4 +507,29 @@ def main():
     snap = False
 
 if __name__ == "__main__":
-    main()
+
+    cap = cv2.VideoCapture(0)
+    detector = handDetector()
+
+
+    while True:
+        success, img = cap.read()
+        img = cv2.flip(img,1)
+
+        img, lmListR, lmListL, handedness = detector.get_info(img)
+
+        if len(lmListR)>0:
+
+            p1,p2 = 8,6
+
+            angle = detector.pointAngle(p1,p2)
+
+            print(int(math.degrees(angle)))
+            #print(int(angle))
+
+        cv2.imshow('img', img)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            cap.release()
+            cv2.destroyAllWindows()
+            break

@@ -13,11 +13,17 @@ Main:
 
         Button:
             text: 'Create new \nGESTURE'
-            on_release: root.new_gesture(ges_name.text)
+            on_release: root.new_gesture(ges_name.text, new.active)
 
         TextInput:
             id: ges_name
             text: 'name you gesture'
+
+        CheckBox:
+            id: new
+            text: 'new ches'
+            Label:
+                text: 'new ges'
 
 
 <NewScreen@BoxLayout>

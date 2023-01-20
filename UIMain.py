@@ -16,6 +16,9 @@ from Tuya import Controller as tuya_controller
 from youTube import youTubeController
 
 import alsaaudio
+import os
+
+ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 '''
 this file will control the main UI for the smart house.
 It will be designed for use with the smart controller
@@ -167,20 +170,44 @@ class Controller():
     def move_to_screen(self,*args):
         screen_name = args[0]
         print(screen_name)
+
         try:self.previous_screen = self.current_screen
         except:pass
         self.current_screen = screen_name
 
+    def get_screen(self):
+        return self.screens[self.current_screen]
+
     def back(self):
         try: self.move_to_screen(self.previous_screen)
         except:pass
+
+    def black_to_transparent(self,img,w_t_t=False):
+        # read the image
+        image_bgr = img
+        # get the image dimensions (height, width and channels)
+        h, w, c = image_bgr.shape
+        # append Alpha channel -- required for BGRA (Blue, Green, Red, Alpha)
+        image_bgra = np.concatenate([image_bgr, np.full((h, w, 1), 255, dtype=np.uint8)], axis=-1)
+        # create a mask where white pixels ([255, 255, 255]) are True
+        if w_t_t: white = np.all(image_bgr == [255, 255, 255], axis=-1)
+        else: white = np.all(image_bgr == [0, 0, 0], axis=-1)
+        # change the values of Alpha to 0 for all the white pixels
+        image_bgra[white, -1] = 0
+        # save the image
+        return image_bgra
+
+
+
+
+
 
 
 class Screen():
     def __init__(
             self,
             background_size=(1280, 720),
-            background_img='background.png',
+            background_img='',
             cursor_size=(60, 60),
             cursor_img='pointer_t.png',
             webcam=False,
@@ -188,6 +215,8 @@ class Screen():
             webobject='',
             name='',
             show_cursor = True,
+            timeout=0,
+            timeout_func=None
     ):
 
         self.show_cursor= show_cursor
@@ -238,6 +267,10 @@ class Screen():
         self.n=0
         self.images_to_add = []
 
+        self.timeout=timeout
+        self.elapsed_time=0
+        self.timeout_func=timeout_func
+        self.idle=True
 
 
 
@@ -257,6 +290,7 @@ class Screen():
     #the image must be tranparent
     #pass size to resize
     def add_image_to_canvas(self,img,coordinates, size=0):
+
         if size!=0:
             try:
                 img = cv2.resize(img,size)
@@ -303,10 +337,28 @@ class Screen():
         if self.show_cursor:
             self.add_cursor_to_canvas(x,y)
 
-        cv2.imshow('canvas', self.canvas)
+        #cv2.imshow('canvas', self.canvas)
         screen = self.overlay(self.background,self.canvas)
 
-        print(self.buttons)
+        if self.timeout > 0 and self.idle:
+
+            if self.elapsed_time == 0:
+                self.start_time = time.time()
+
+            self.elapsed_time = time.time() - self.start_time
+
+            if self.elapsed_time > self.timeout:
+                self.elapsed_time=0
+                try:
+                    self.timeout_func()
+                except:
+                    #IF TIMEOUT FUNC WASNT PASSED THIS WILL JUST RERURN THE SAME SCREEN LIKE ALWAYS
+                    print('screen timeout. moving to previous screen')
+                    return screen
+
+        else: self.elapsed_time=0
+
+        #print(self.buttons)
         return screen
 
 
@@ -382,7 +434,7 @@ class Screen():
     def add_img_to_canvas(self,image):
         img= image[0]
         coordinates= image[1]
-        try:self.canvas[coordinates[0]:coordinates[0]+img.shape[1],coordinates[1]:coordinates[1]+img.shape[0]] = img
+        try:self.canvas[coordinates[0]:coordinates[0]+img.shape[0],coordinates[1]:coordinates[1]+img.shape[1]] = img
         except Exception as e: print(e)
 
 
@@ -526,15 +578,18 @@ class Button():
         }
 
         self.size = (
-            self.coordinates['endX'] - self.coordinates['startX'],
-            self.coordinates['endY'] - self.coordinates['startY'],
+            self.coordinates['endX'] - self.coordinates['startX']-2,
+            self.coordinates['endY'] - self.coordinates['startY']-2,
 
                      )
 
 
         try: l = len(img)
         except: self.img= np.zeros((self.size[1],self.size[0],4))
-        else: self.img = img
+        else:
+            img = Controller().black_to_transparent(img)
+            img = cv2.resize(img, self.size)
+            self.img = img
 
         if border:
             self.img = cv2.copyMakeBorder(src=self.img, top=1,bottom=1,left=1,right=1,value=(255,255,255),borderType=cv2.BORDER_CONSTANT)
@@ -969,45 +1024,47 @@ if __name__ == '__main__':
     while True:
 
         #get info about hand
-        success, img = cap.read()
-        img = cv2.flip(img, 1)
+        # success, img = cap.read()
+        # img = cv2.flip(img, 1)
 
-        img, lmListR, lmListL, handedness = detector.get_info(img)
-
-        if len(lmListR) != 0 or len(lmListL) != 0:
-            cv2.circle(img,(400,400),50, (0,255,0),-1)
-            fingers = detector.fingerCounter()
-
-            if handedness=='Right':
-                x, y = lmListR[8][1], lmListR[8][2]
-
-            elif handedness == 'Left':
-                x, y = lmListL[8][1], lmListL[8][2]
+        # img, lmListR, lmListL, handedness = detector.get_info(img)
+        #
+        # if len(lmListR) != 0 or len(lmListL) != 0:
+        #     cv2.circle(img,(400,400),50, (0,255,0),-1)
+        #     fingers = detector.fingerCounter()
+        #
+        #     if handedness=='Right':
+        #         x, y = lmListR[8][1], lmListR[8][2]
+        #
+        #     elif handedness == 'Left':
+        #         x, y = lmListL[8][1], lmListL[8][2]
 
             #screen = ui.run(x,y,controller)
-            controller.run([],detector,x,y)
-            cv2.setWindowProperty('screen', 0, 1)
+            #controller.run([],detector,x,y)
+            #cv2.setWindowProperty('screen', 0, 1)
 
             #cv2.imshow('screen',screen)
+        #
+        # else:
+        #     cv2.setWindowProperty('screen', 0, 0)
+        #
+        #     x,y=0,0
 
-        else:
-            cv2.setWindowProperty('screen', 0, 0)
 
-            x,y=0,0
-
-
-
+        screen = np.zeros((320,320))
         #screen = ui.run(x,y, controller)
-        screen = ui_controller.screens[ui_controller.current_screen].run(x,y,img)
+        #screen = ui_controller.screens[ui_controller.current_screen].run(x,y,img)
         cv2.imshow('screen', screen)
-        cv2.imshow('img',img)
+        #cv2.imshow('img',img)
 
 
 
         #print(controller.csn)
 
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cap.release()
-            cv2.destroyAllWindows()
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     cap.release()
+        #     cv2.destroyAllWindows()
+        #     break
+
+        cv2.waitKey(1)

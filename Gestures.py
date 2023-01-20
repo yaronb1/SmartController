@@ -11,6 +11,9 @@ import csv
 import time
 
 import collections
+import os
+import datetime
+ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Gesture():
@@ -50,12 +53,13 @@ class Gesture():
                  func=None,
                  path = '/home/yaron/PycharmProjects/SmartController/datasets/',
                  gesture_time = 1,
-                 args=[]
+                 args=[],
+                 new = False
                  ):
 
         #self.detector = detector
         self.name = name
-        self.path = path
+        self.path = path + str(name) +'/'
         self.func = func
         self.start = False
         self.count = 0
@@ -69,6 +73,8 @@ class Gesture():
 
         try: self.model = self.load_model()
         except: print('no model')
+
+        self.new=new
 
     #creates a list defining each angle between the point of the hand
     #list type will describe if the list is of the gesture, Not of the gesture, a list from the webcam which will be checked
@@ -109,6 +115,11 @@ class Gesture():
         elif list_type == -1:
             pass
 
+        elif list_type==2:
+            angle_list.append(self.name+'_start')
+        elif list_type==3:
+            angle_list.append(self.name+'_end')
+
 
         return angle_list
 
@@ -131,7 +142,10 @@ class Gesture():
                   'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13', 'ring 13 -14',
                   'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20', 'gesture']
 
-        data_file = self.path + str(self.name) + '.csv'
+        try:data_file = self.path + str(self.name) + '.csv'
+        except:
+            print(type(self.path))
+            data_file=self.path + str(self.name) + '/' + str(self.name) + '.csv'
         with open(data_file, 'w') as f:
             writer = csv.writer(f)
             if len(headers) == 0:
@@ -157,7 +171,7 @@ class Gesture():
 
         return loaded_model
 
-    def create_gesture(self,detector, n =5, num_of_samples =100):
+    def create_gesture(self,detector, n =5, num_of_samples =200):
         '''
         collects as many angle list as possible,
         collects NOT angle lists
@@ -170,7 +184,7 @@ class Gesture():
         '''
 
         if self.start == False:
-            self.create_new_file()
+            if self.new:self.create_new_file()
             self.start = True
             self.samples = 0
             self.status = 1
@@ -209,6 +223,42 @@ class Gesture():
         #positive sampling done when returns 0
         else: return 0
 
+    def create_negatives(self,detector, n =5, num_of_samples =1000):
+        '''
+
+
+        @param  n - take angle list every n'th frame
+
+        :return: done when all values have been stored and the module has been created
+        '''
+
+        if self.start == False:
+            self.create_new_file()
+            self.start = True
+            self.samples = 0
+            print('started')
+
+        elif self.start:
+
+            self.count += 1
+
+            if self.count == n:
+                self.count = 0
+                try: angles = self.create_angle_list(detector,0)
+                except Exception as e: print(e)
+                else:
+                    print(angles)
+                    self.save_angle_list(angles)
+                    self.samples +=1
+                    print(self.samples)
+
+            if self.samples == num_of_samples:
+                return 1
+            else: return 0
+
+
+
+
 
     def check_ges(self,detector):
 
@@ -216,6 +266,8 @@ class Gesture():
 
 
         result = self.model.predict(np.array([angles]))[0]
+        #print(result)
+        #print(self.name)
 
         if str(result) == self.name:
             if self.started:
@@ -225,6 +277,14 @@ class Gesture():
                 if self.elapsed > self.gesture_time:
                     self.started = False
                     self.elapsed =0
+                    try:
+                        # func to save angle list and collect data
+                        file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
+                        with open(file, 'w') as f:
+                            f.write(str(angles))
+                    except Exception as e:
+                        print(e)
+
                     return True
             else:
                 self.started = True
@@ -236,46 +296,79 @@ class Gesture():
 
         return False
 
+    def create_directory(self):
+
+        #create folder
+        directory = '/datasets/' + str(self.name)
+        path = os.path.join(ROOTDIR,directory)
+        try:os.mkdir(ROOTDIR + directory)
+        except: print('dir already exist')
+        print("Directory '% s' created" % directory)
+
+    def copy_negatives(self):
+        file = ROOTDIR + "/datasets/nope.csv"
+        nf =  ROOTDIR +  "/datasets/" + str(self.name) + '/' + str(self.name) + ".csv"
+
+
+        with open(file, 'r') as origFile:
+            with open(nf, 'a') as newFile:
+                lineList = []
+                headers = True
+                for line in origFile:
+                    #strippedLine = line.strip()
+                    #lineList = strippedLine.split(',')
+
+                    #
+                    # lineStr = str(lineList)
+                    # lineStr = lineStr.replace("'", "")
+
+                    #newFile.write(lineStr)
+                    if headers:
+                        headers = False
+                    else:
+                        newFile.write(line)
+                    # newFile.write('\n')  # Insert a new line
+                    # i += 1
+
+
+
+        origFile.close()
+        newFile.close()
+
 
 
 '''
-the movemnet gesture requirse 2 gestures (created with the above class)
-start ges - to trigger the movemnet
-end ges to complete it
+for movemnet we will have 2 gestures.
+one start and one end
 
-(we can consider doing an in between gesture as well)
+they will be stored in the same csv filke.
 
-this can be passed nin 2 fors
-either create 2 seperate gestures with their respective positive and negative images 
-which will be passed as start and end ges 
+the idea is the model will recogbise start then end
+the negatives will be the same but the model will also differentiate between start and end
 
-or 
+inherits from Gesture
+check ges is overiden
 
-create one gestuder where the positive is start and negative is end 
-passed as one variable- gesture 
+args
+
+func to run when recognised
+args for func if needed
+timer - MAXIMUM time between start and end to be considered the movemnet
+name - name the gesture, the older where the model and the csv file are store
+
 '''
-class Movement:
+class Movement(Gesture):
 
     def __init__(self,
-             gesture=None,
-             start_ges=None,
-             end_ges=None,
+
              func=None,
              args=[],
-             timer = 0.5):
+             timer = 0.5,
+             name='',
+                 ):
 
-        if gesture is None:
-            self.start_ges = start_ges
-            self.end_ges = end_ges
+        super(Movement, self).__init__(name=name)
 
-        else:
-            self.start_ges = gesture
-            self.end_ges = gesture
-            self.end_ges.name = 'nope'
-
-
-        self.start_ges.gesture_time = 0
-        self.end_ges.gesture_time=0
         self.timer=timer
 
         self.started = False
@@ -283,20 +376,83 @@ class Movement:
 
         self.func=func
         self.args=args
+        self.name = name
+
+    def create_movement(self, detector, n=5, num_of_samples=200):
+        '''
+
+
+        @param  n - take angle list every n'th frame
+                num of samples- will take this number of start samples and end samples
+
+        :return: 1  when all values have been stored and the module has been created
+        '''
+
+        if self.start == False:
+            self.create_new_file()
+            self.start = True
+            self.samples = 0
+            self.status = 2  # start ges
+            print('started')
+
+        elif self.start:
+
+            self.count += 1
+
+            if self.count == n:
+                self.count = 0
+                try:
+                    angles = self.create_angle_list(detector, self.status)
+                except Exception as e:
+                    print(e)
+                else:
+                    print(angles)
+                    self.save_angle_list(angles)
+                    self.samples += 1
+                    print(self.samples)
+
+            if self.samples == num_of_samples:
+
+                if self.status == 2:
+                    self.status = 3  # end ges
+                    print('do end gesture')
+                    time.sleep(2)
+                    self.samples = 0
+                    return 0
+
+                if self.status == 3:
+                    self.copy_negatives()
+                    self.train_model()
+                    return 1  # done
+
+            else:
+                return 0
 
 
     def check_ges(self, detector):
 
-        if self.start_ges.check_ges(detector):
+        angles = self.create_angle_list(detector,-1)
+
+
+        result = self.model.predict(np.array([angles]))[0]
+
+        #print(self.end_ges.name)
+        if result == self.name +'_start':
             self.started = True
             self.start_time = time.time()
 
         if self.started:
             now = time.time()
             self.elapsed = now - self.start_time
-            if self.elapsed < self.timer and self.end_ges.check_ges(detector):
+            if self.elapsed < self.timer and result == self.name+'_end':
                 self.started = False
                 self.elapsed = 0
+                try:
+                    # func to save angle list and collect data
+                    file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
+                    with open(file, 'w') as f:
+                        f.write(str(angles))
+                except Exception as e: print(e)
                 return True
 
             if self.elapsed > self.timer:
@@ -312,70 +468,51 @@ class Movement:
 
 
 
-def all_off(*args):
-    print('alloff')
+
+def create_movement(name):
 
 
-def kill(*args):
-    print('kill')
-
-
-
-if __name__ == '__main__':
-
-    import SmartController as sm
-
-
-    # the model will be an array consisiting of three values
-    # the first is a model for the start of gesture, second is a model for the end of the gesture
-    # and third is an int for the timeout inbetween
-
-    #CRETATING THE MODEL
-
-    #step 1 the user will tarin the model with only how the gesture looks in the beginnig
+    ges = Movement(name = name)
+    ges.create_directory()
+    Movement.status = 2
 
     cap = cv2.VideoCapture(0)
     detector = hl.handDetector()
-
-    # create the constructor
-    all_off_start = Gesture('all_off_start')
-    all_off_end = Gesture('all_off_end')
-    all_off_movement = Movement(start_ges=all_off_start, end_ges=all_off_end,func=all_off)
-
-    kill_gesture = Gesture('kill')
-    kill_movement = Movement(gesture=kill_gesture, func=kill)
-
-    controller = sm.Controller()
-
-    home = sm.Screen(name = 'home')
-    #home.add_gesture(end)
-    #home.add_gesture(ges)
-    home.add_gesture(all_off_movement)
-    home.add_gesture(kill_movement)
-
-    controller.add_screen(home)
-
-
-
-
+    done = 0
 
     while True:
         success, img = cap.read()
 
-        img = cv2.flip(img,1)
+        img = cv2.flip(img, 1)
 
         img, lmListR, lmListL, handedness = detector.get_info(img)
+
+        if len(lmListR) !=0 or len(lmListL)!=0:
+            if ges.start == False:
+                time.sleep(0.5)
+                cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
+
+            done = ges.create_movement(detector)
+
 
 
         cv2.imshow('img', img)
 
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF==ord('q'):
+            break
+        if done==1:
+            cv2.imwrite(ROOTDIR + '/datasets/' + name + '/end_img.jpg', img)
             break
 
-        if len(lmListR)!=0 or len(lmListL)!=0:
+if __name__ == '__main__':
 
-            controller.run([],detector =detector, x=0, y=0)
+    create_movement('gun')
+    # ges = Movement(name='screw')
+    # ges.copy_negatives()
+    # ges.train_model()
+
+
+
 
 
 

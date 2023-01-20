@@ -1,3 +1,5 @@
+import os.path
+
 import pandas as pd
 import sklearn
 from sklearn.metrics import classification_report
@@ -11,8 +13,18 @@ import pickle
 import Gestures
 
 
+ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 
-def create_model(file_name, save = True):
+models = {
+    'logistic regression' : LogisticRegression,
+    'k nearest neighbours' : KNeighborsClassifier,
+    'support vector machine': SVC
+
+}
+
+def create_model(file_name, save = True, model_to_use= 'logistic regression'):
+
+
     data_file = str(file_name) + '.csv'
     data = pd.read_csv(data_file)
 
@@ -33,55 +45,113 @@ def create_model(file_name, save = True):
     #print(X_train)
     #print(y_train)
 
-    # SVC_model = sklearn.svm.SVC()
+    #SVC_model = sklearn.svm.SVC()
     # # KNN model requires you to specify n_neighbors,
     # # the number of points the classifier will look at to determine what class a new point belongs to
-    # KNN_model = KNeighborsClassifier(n_neighbors=5)
+    #KNN_model = KNeighborsClassifier(n_neighbors=5)
 
-    l_reg_model = LogisticRegression()
+    #l_reg_model = LogisticRegression()
+
+    model = models[model_to_use]()
 
 
 
 
     # SVC_model.fit(X_train, y_train)
     # KNN_model.fit(X_train, y_train)
-    l_reg_model.fit(X_train, y_train)
+    # l_reg_model.fit(X_train, y_train)
+
+    model.fit(X_train, y_train)
 
 
     # SVC_prediction = SVC_model.predict(X_test)
     # KNN_prediction = KNN_model.predict(X_test)
-    l_reg_prediction = l_reg_model.predict(X_test)
+    # l_reg_prediction = l_reg_model.predict(X_test)
+
+    model_prediction = model.predict(X_test)
 
 
     if save:
         model_name = str(file_name) + '_finalized_model.sav'
-        pickle.dump(l_reg_model, open(model_name, 'wb'))
+        pickle.dump(model, open(model_name, 'wb'))
+
 
     # Accuracy score is the simplest way to evaluate
     # print(accuracy_score(SVC_prediction, y_test))
-    # print(accuracy_score(KNN_prediction, y_test))
-    print(accuracy_score(l_reg_prediction, y_test))
+    #print(accuracy_score(KNN_prediction, y_test))
+    #print(accuracy_score(l_reg_prediction, y_test))
     # But Confusion Matrix and Classification Report give more details about performance
     #print(confusion_matrix(SVC_prediction, y_test))
     #print(classification_report(KNN_prediction, y_test))
-    print(classification_report(l_reg_prediction, y_test))
+    #print(classification_report(l_reg_prediction, y_test))
 
+    print(classification_report(model_prediction, y_test))
 
 
 def check():
     print('hooray')
 
 
-path = '/home/yaron/PycharmProjects/SmartController/datasets/'
-g= 'gun'
-
-file = path + g
-
 if __name__ == "__main__":
 
 
-    #gun = Gestures.Gesture(name='gun',func=check)
+    #create_model(file_name=ROOTDIR + '/datasets/snap_start', model_to_use='k nearest neighbours')
+    # create_model(file_name=ROOTDIR + '/datasets/snap_start', model_to_use='k nearest neighbours')
+    # create_model(file_name=ROOTDIR + '/datasets/snap_start', model_to_use='k nearest neighbours')
+    #create_model(file_name=ROOTDIR + '/datasets/snap_end', model_to_use='k nearest neighbours')
+    #create_model(file_name=ROOTDIR + '/datasets/snapFull', model_to_use='logistic regression')
 
-    #gun.model.predict()
 
-    create_model(file,save = False)
+    snap_start = Gestures.Gesture(name='snap_start', func = lambda: print('snap_start'))
+    snap_end = Gestures.Gesture(name='snap_end', func = lambda: print('snap_end'))
+    snap = Gestures.Movement(start_ges=snap_start, end_ges=snap_end, func = lambda : print('snap'))
+
+
+
+    print(snap_start.model, snap_end.model)
+
+    # s = Gestures.Gesture(name= 'snapFull')
+    # snap = Gestures.Movement(s, func = lambda : print('snap'))
+    # print(s.model)
+
+    import SmartController as sm
+    import cv2
+    import handLandmarks as hl
+
+
+    cap = cv2.VideoCapture(-1)
+    detector = hl.handDetector()
+
+
+
+    controller = sm.Controller()
+
+    home = sm.Screen(name = 'home')
+
+    # home.add_gesture(snap_start)
+    # home.add_gesture(snap_end)
+    home.add_gesture(snap)
+
+    controller.add_screen(home)
+
+
+
+
+
+    while True:
+        success, img = cap.read()
+
+        img = cv2.flip(img,1)
+
+        img, lmListR, lmListL, handedness = detector.get_info(img)
+
+
+        cv2.imshow('img', img)
+
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        if len(lmListR)!=0 or len(lmListL)!=0:
+
+            controller.run([],detector =detector, x=0, y=0)

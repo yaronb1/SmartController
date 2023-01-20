@@ -39,13 +39,20 @@ except: pass
 import subprocess
 import os
 
-import alsaaudio
+
 import time
 
 
 from Tools import ColorEnhancer
 
 import Tools
+
+import concurrent.futures
+import multiprocess
+import threading
+
+from loky import get_reusable_executor
+
 '''
 @brief
 this is the base object we will use. It will contain all the different screens 
@@ -81,6 +88,7 @@ class Controller():
 
         self.csn =csn
         self.web_object=web_object
+        self.idle=True
 
         
     
@@ -132,6 +140,22 @@ class Controller():
 
         screen = self.screen_dict[self.csn]
 
+        if screen.timeout>0 and self.idle:
+
+            if screen.elapsed_time==0:
+                screen.start_time = time.time()
+
+            screen.elapsed_time = time.time() - screen.start_time
+
+            if screen.elapsed_time>screen.timeout:
+                screen.elapsed_time=0
+                try:screen.timeout_func()
+                except:
+                    print('screen timeout. moving to previous screen')
+                    self.back()
+
+        else: screen.elapsed_time=0
+
 
 
 
@@ -159,13 +183,110 @@ class Controller():
                 if hover:
                     button.hover_over(args)
                 else:
-                    button.func(button.args)
+                    try:button.func(button.args)
+                    except:button.func()
+
+        if 'canvas' in self.screen_dict:
+            canvas = self.screen_dict['canvas']
+
+            for ges in canvas.gestures:
+                try:
+                    b = ges.check_ges(fingers)
+                except:
+                    # print('fingers error')
+                    try:
+                        a = ges.check_ges(detector)
+                    except:
+                        pass
+                    else:
+                        if a:
+                            try:
+                                ges.func()
+                            except:
+                                ges.func(ges.args)
+
+                else:
+                    if b:
+                        try:
+                            ges.func(ges.args)
+                        except:
+                            ges.func()
+
+            for button in canvas.buttons:
+                if button.active and button.buttonPressed(x, y):
+
+                    if hover:
+                        button.hover_over(args)
+                    else:
+                        button.func(button.args)
+
+    # def run_process(self,args,detector, x=0, y=0,hover=False,fingers=[]):
+    #
+    #
+    #     if len(fingers) ==0:
+    #         fingers = detector.fingerCounter()
+    #     screen = self.screen_dict[self.csn]
+    #     processes=[]
+    #     #q = multiprocessing.Queue()
+    #     for ges in screen.gestures:
+    #         #p = multiprocess.Process(target=ges.check_ges,args=[fingers])
+    #         p = threading.Thread(target=ges.check_ges, args=[fingers])
+    #         p.start()
+    #         processes.append(p)
 
 
-                
+        #print(q.get())
+        # for process in processes:
+        #     process.join()
+        #     #print(process.get())
+
+
+        results = []
+        # with concurrent.futures.ProcessPoolExecutor() as executer:
+        #     for ges in screen.gestures:
+        #         f= executer.submit(ges.check_ges,fingers)
+        #         #except: f = executer.submit(check_gesture,ges,detector)
+        #
+        #         results.append(f)
+        #         #
+        #         # f= executer.submit(check_gesture,'s','s')
+        #         # results.append(f)
+        #
+        #
+        #     for f in concurrent.futures.as_completed(results): #  prints in order they compltee complete
+        #         print(f.result())
+
+        # executer = get_reusable_executor()
+        #
+        # for ges in screen.gestures:
+        #     res=executer.submit(ges.check_ges,fingers)
+        #     results.append(res)
+        #
+        # for res in results:
+        #     print(res.result())
+        #     if res.result():
+        #         cv2.waitKey(0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def back(self):
+        try: self.move_to_screen(self.psn)
+        except:pass
             
     def move_to_screen(self, name):
-        print('moved')
+        print('moved to ' + str(name) + ' screen')
+        try:self.psn = self.csn
+        except:pass
         self.csn = str(name)
     #gets the screen res on linux
     #still needs some work 
@@ -282,15 +403,19 @@ class Gesture():
 
                 
         self.elapsed=0
+
         
         
     #controller.run will continuasly check this func to return
     #true is gesture is seen
     def check_ges(self,fingers, start_ges = False, end_ges=False):
 
-        if len(fingers)>5:
+        if len(fingers)>5 and len(self.gesture) <=5 :
             fingers1= fingers[:5]
             fingers2 = fingers[5:]
+
+
+
 
             if fingers1==self.gesture or fingers2==self.gesture:
                 if self.started:
@@ -299,6 +424,7 @@ class Gesture():
                     #print(int(elapsed))
                     if self.elapsed>self.gestureTime:
                         self.started=False
+                        #self.func(self.args)
                         return True
                 else:
                      self.started=True
@@ -311,19 +437,24 @@ class Gesture():
             return False
 
         else:
+
             if fingers == self.gesture:
                 if self.started:
+                    #print('staretd')
                     now = time.time()
                     self.elapsed = now - self.startTime
                     # print(int(elapsed))
                     if self.elapsed > self.gestureTime:
                         self.started = False
+                        #self.func(self.args)
                         return True
                 else:
+                    #print('starting')
                     self.started = True
                     self.startTime = time.time()
 
             else:
+                #print('enduing')
                 self.started = False
                 self.elapsed = 0
 
@@ -395,7 +526,9 @@ class Screen():
                  draw=False,
                  web_object = None,
                  name = 'default_screen',
-                 args = []
+                 args = [],
+                 timeout=0,
+                 timeout_func= None
                  
                  ):
         self.buttons=[]
@@ -413,6 +546,10 @@ class Screen():
         self.start=True
         
         self.images_folder = 'images'
+
+        self.timeout= timeout
+        self.elapsed_time=0
+
         
 
     def add_args(self,arg):

@@ -25,7 +25,7 @@ class youTubeController():
 
         options = webdriver.ChromeOptions()
         options.add_argument("~/.config/google-chrome/Profile1")
-        self.driver = webdriver.Chrome(chrome_options=options)
+        self.driver = webdriver.Chrome(options=options)
         self.UI =[]
         
     #opens youstube and signs in with the username and password 
@@ -78,17 +78,17 @@ class youTubeController():
             except:
                 print("cannot set size")
 
-    #click voice search button 
-    # we need to check how to give it permisiions 
-    def voiceSearch(self):
-    
-        try:
-            WebDriverWait(self.driver, 0).until(
-                EC.presence_of_element_located((By.XPATH, "/html/body/ytd-app/div/div/ytd-masthead/div[3]/div[2]/div/ytd-button-renderer/a/yt-icon-button/button/yt-icon"))
-                ).click()
-        
-        except:
-            print("voice search error")
+    # #click voice search button
+    # # we need to check how to give it permisiions
+    # def voiceSearch(self):
+    #
+    #     try:
+    #         WebDriverWait(self.driver, 0).until(
+    #             EC.presence_of_element_located((By.XPATH, "/html/body/ytd-app/div/div/ytd-masthead/div[3]/div[2]/div/ytd-button-renderer/a/yt-icon-button/button/yt-icon"))
+    #             ).click()
+    #
+    #     except Exception as e:
+    #         print(e)
 
     #scrolls down
     def scroll(self):
@@ -106,18 +106,22 @@ class youTubeController():
              ).click()
             
         except: print("next song error")
-        
-    def select(self,*args):
-        try:videos = self.driver.find_element(By.XPATH, '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div[2]/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[1]/div[1]/div/div[1]/div/h3/a')
-        except Exception as e:print(e)
-        else:
-            try: ActionChains(self.driver).move_to_element(videos).click(videos).perform()
 
-            # except:
-            #     try:
-            #         videos = self.driver.find_elements(By.ID, 'img')
-            #         videos[0].click()
-            except Exception as e: print(e)
+
+
+    #gets a list of all the videos on the page
+    #selects the first one
+    def select(self,*args):
+        # try:videos = self.driver.find_element(By.XPATH, '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div[2]/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[1]/div[1]/div/div[1]/div/h3/a')
+        # except Exception as e:print(e)
+        # else:
+            #try: ActionChains(self.driver).move_to_element(videos).click(videos).perform()
+
+            #except:
+                try:
+                    videos = self.driver.find_elements(By.ID, 'img')
+                    videos[0].click()
+                except Exception as e: print(e)
         
     def play(self):
         try:
@@ -143,7 +147,7 @@ class youTubeController():
         #actions.move_to_element_with_offset(self.driver.find_elements(by=By.TAG_NAME,value='html'),x,y).click().perform()
             
             
-    def waitForPageToLoad(self,width,height, TO=1):
+    def waitForPageToLoad(self,width=0,height=0, TO=1):
         #WebDriverWait(self.driver,TO).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"#movie_player > div.html5-video-container > video")))
         
         try:WebDriverWait(self.driver,TO).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"#movie_player > div.html5-video-container > video")))
@@ -161,6 +165,53 @@ class youTubeController():
             
     def ping(self):
         return self.driver.current_url
+
+
+    #send the txt keys to the search bar and searches
+    def search(self, txt):
+        try:
+            element = WebDriverWait(self.driver, 1).until(
+                EC.presence_of_element_located((By.XPATH,
+                                                "/html/body/ytd-app/div[1]/div/ytd-masthead/div[3]/div[2]/ytd-searchbox/form/div[1]/div[1]/input"))
+            )
+            element.send_keys(str(txt))
+            element.submit()
+        except:
+            print("next song error")
+
+    #full screen by pressing f on the html page
+    def full_screen(self):
+
+        try:
+            element = WebDriverWait(self.driver, 1).until(
+                EC.presence_of_element_located((By.XPATH,
+                                                "/html"))
+            )
+            element.send_keys('f')
+
+        except Exception as e:
+            print(e)
+
         
-        
-        
+if __name__=="__main__":
+
+    import Speech
+    yt = youTubeController()
+
+    #
+    # cv2.waitKey(0)
+    #
+    yt.openYoutube()
+
+
+
+    txt = Speech.listen()
+
+    yt.search(txt)
+
+    yt.waitForPageToLoad()
+    yt.select()
+
+    yt.waitForPageToLoad()
+    yt.full_screen()
+

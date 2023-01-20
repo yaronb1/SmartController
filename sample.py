@@ -29,7 +29,7 @@ import subprocess
 import os
 
 import SmartController as sc
-from SmartController import SimpleUI
+#from SmartController import SimpleUI
 from Gestures import Gesture, Movement
 
 import Tuya
@@ -290,10 +290,6 @@ def main():
     # youtubeScreen.add_images('optionsY', size)
 
 
-    media = SimpleUI().MediaButtons(img = img)
-    bg = media.play_button()
-    bg = media.next_button()
-    bg, vol_bar= media.volume_bar()
 
 
 
@@ -343,13 +339,13 @@ def main():
 
 
 
-    controller.add_screen_dict(startScreen)
-    controller.add_screen_dict(homeScreen)
-    controller.add_screen_dict(drawScreenMain)
-    controller.add_screen_dict(drawScreenBrush)
-    controller.add_screen_dict(drawScreenLips)
-    controller.add_screen_dict(youtubeScreen)
-    controller.add_screen_dict(lightScreen)
+    controller.add_screen(startScreen)
+    controller.add_screen(homeScreen)
+    controller.add_screen(drawScreenMain)
+    controller.add_screen(drawScreenBrush)
+    controller.add_screen(drawScreenLips)
+    controller.add_screen(youtubeScreen)
+    controller.add_screen(lightScreen)
 
     #cap = cv2.VideoCapture(-1)
 
