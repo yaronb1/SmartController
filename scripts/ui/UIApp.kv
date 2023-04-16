@@ -1,0 +1,107 @@
+Main:
+
+<Main@BoxLayout>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'START'
+            on_release: root.start_main()
+
+        Button:
+            text: 'Create new \nSCREEN'
+            on_press: root.manager.current = 'NewScreen'
+
+        Button:
+            text: 'Create new \nGESTURE'
+            on_release: root.new_gesture(ges_name.text, new.active)
+
+        TextInput:
+            id: ges_name
+            text: 'name you gesture'
+
+        CheckBox:
+            id: new
+            text: 'new ches'
+            Label:
+                text: 'new ges'
+
+
+<NewScreen@BoxLayout>
+    on_enter: root.build()
+    AnchorLayout:
+        anchor_y: 'center'
+        anchor_x: 'center'
+        size_hint: 1, .8
+        id: image
+
+    #StackLayout:
+    #BoxLayout:
+    AnchorLayout:
+        #id: menu
+        #orientation: 'lr-tb'
+        #orientation: 'horizontal'
+        anchor_x: 'left'
+        anchor_y: 'top'
+
+        BoxLayout:
+            id: ges_menu
+            size_hint: .5,.2
+            BoxLayout:
+                orientation: 'vertical'
+                Button:
+                    text: "Add Ges"
+                    on_release: root.add_ges()
+                    size_hint: 1,.3
+                TextInput:
+                    id: ges_info
+                    text: 'info'
+                    size_hint: 1,.3
+                    on_text: root.args = self.text
+
+    AnchorLayout:
+        anchor_x: 'right'
+        anchor_y: 'top'
+
+        BoxLayout:
+            id: button_menu
+            size_hint: .5,.2
+            BoxLayout:
+                orientation: 'vertical'
+                Button:
+                    text: "Add Button"
+                    on_release: root.add_button()
+                    size_hint: 1,.3
+                TextInput:
+                    id: button_info
+                    text: 'info'
+                    size_hint: 1,.3
+                    on_text: root.args = self.text
+
+    AnchorLayout:
+        anchor_x: 'left'
+        anchor_y: 'bottom'
+        BoxLayout:
+            TextInput:
+                id: screen_name
+                text: "Name your Screen"
+                size_hint: 1,.1
+
+            Button:
+                text: "Save Screen"
+                on_release: root.save_screen()
+                size_hint: 1,.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
