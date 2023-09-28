@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .. import AI
+from scripts import AI
 import scripts.detectors.handLandmarks as hl
 
 import pickle
@@ -131,8 +131,9 @@ class Gesture():
     # the variable angle list must be created using the above function
     # this function appends to an existing angle list with relevant headers
     def save_angle_list(self, angle_list):
-        data_file = self.path + str(self.name) + '.csv'
+        #data_file = self.path + str(self.name) + '.csv'
 
+        data_file = os.path.join(self.path,self.name+'.csv')
         #store angle list in csv file
         with open(data_file, 'a') as f:
             writer = csv.writer(f)
@@ -145,10 +146,10 @@ class Gesture():
                   'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13', 'ring 13 -14',
                   'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20', 'gesture']
 
-        try:data_file = self.path + str(self.name) + '.csv'
-        except:
-            print(type(self.path))
-            data_file=self.path + str(self.name) + '/' + str(self.name) + '.csv'
+
+            #data_file = self.path + str(self.name) + '.csv'
+        data_file =os.path.join(self.path,self.name +'.csv')
+
         with open(data_file, 'w') as f:
             writer = csv.writer(f)
             if len(headers) == 0:
@@ -158,14 +159,15 @@ class Gesture():
 
 
     def train_model(self):
-        data_file = self.path +str(self.name)
+        #data_file = self.path +str(self.name)
+        data_file = os.path.join(self.path,self.name)
 
-        AI.create_model(data_file)
+        AI.create_pipe(data_file)
 
     def load_model(self, file_path=''):
         try:
             #filename = self.path + str(self.name) + '_finalized_model.sav'
-            filename = os.path.join(str(self.path),str(self.name)+'_finalized_model.sav')
+            filename = os.path.join(str(self.path),str(self.name)+'_finalized_pipe_.sav')
             loaded_model = pickle.load(open(filename, 'rb'))
 
         except:
@@ -187,11 +189,12 @@ class Gesture():
         :return: done when all values have been stored and the module has been created
         '''
 
+
         if self.start == False:
-            if self.new:self.create_new_file()
+            self.create_new_file()
             self.start = True
             self.samples = 0
-            self.status = 1
+            self.status = 2  # start ges
             print('started')
 
         elif self.start:
@@ -200,32 +203,32 @@ class Gesture():
 
             if self.count == n:
                 self.count = 0
-                try: angles = self.create_angle_list(detector,self.status)
-                except Exception as e: print(e)
+                try:
+                    angles = self.create_angle_list(detector, self.status)
+                except Exception as e:
+                    print(e)
                 else:
                     print(angles)
                     self.save_angle_list(angles)
-                    self.samples +=1
+                    self.samples += 1
                     print(self.samples)
 
             if self.samples == num_of_samples:
-                self.samples = 0
-                self.status = self.status - 1
-                print('do negative samples')
-                time.sleep(3)
 
-        #done when returns 1
-        if self.status == -1:
-            self.train_model()
-            self.model = self.load_model()
-            return 1
 
-        #negative sampling is done when returns -1
-        elif self.status==0:
-            return -1
 
-        #positive sampling done when returns 0
-        else: return 0
+
+                self.copy_negatives()
+                self.train_model()
+                return 1  # done
+
+            else:
+                return 0
+
+        ''''''''
+
+
+
 
     def create_negatives(self,detector, n =5, num_of_samples =1000):
         '''
@@ -274,7 +277,7 @@ class Gesture():
         #print(result)
         #print(self.name)
 
-        if str(result) == self.name:
+        if str(result) == self.name + '_start':
             if self.started:
                 now = time.time()
                 self.elapsed = now - self.start_time
@@ -285,7 +288,7 @@ class Gesture():
                     try:
                         # func to save angle list and collect data
                         #file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
-                        file = os.path.join(ROOTDIR,'datasets','datasets', str(self.name),'recognitions', str(datetime.datetime.now().strftime('%d_%b - %H:%M'))+'.csv')
+                        file = os.path.join(ROOTDIR,'datasets', str(self.name),'recognitions', str(datetime.datetime.now().strftime('%d_%b - %H:%M'))+'.csv')
                         with open(file, 'w') as f:
                             f.write(str(angles))
                     except Exception as e:
@@ -305,16 +308,19 @@ class Gesture():
     def create_directory(self):
 
         #create folder
-        directory = '/datasets/' + str(self.name)
-        path = os.path.join(ROOTDIR,directory)
-        try:os.mkdir(ROOTDIR + directory)
+        try:
+            os.mkdir(os.path.join(ROOTDIR, 'datasets', self.name))
+            os.mkdir(os.path.join(ROOTDIR, 'datasets', self.name, 'recognitions'))
+            os.mkdir(os.path.join(ROOTDIR, 'datasets', self.name, 'recognitions', 'False'))
+            os.mkdir(os.path.join(ROOTDIR, 'datasets', self.name, 'recognitions', 'True'))
         except: print('dir already exist')
-        print("Directory '% s' created" % directory)
+        print("Directory '% s' created" % self.name)
 
     def copy_negatives(self):
-        file = ROOTDIR + "/datasets/nope.csv"
-        nf =  ROOTDIR +  "/datasets/" + str(self.name) + '/' + str(self.name) + ".csv"
-
+        #file = ROOTDIR + "/datasets/nope.csv"
+        file = os.path.join(ROOTDIR,'datasets', 'negatives', 'negatives.csv' )
+        #nf =  ROOTDIR +  "/datasets/" + str(self.name) + '/' + str(self.name) + ".csv"
+        nf= os.path.join(ROOTDIR,'datasets', self.name, self.name +'.csv' )
 
         with open(file, 'r') as origFile:
             with open(nf, 'a') as newFile:
@@ -457,7 +463,7 @@ class Movement(Gesture):
                 try:
                     # func to save angle list and collect data
                     #file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
-                    file = os.path.join(ROOTDIR, 'datasets', 'datasets', str(self.name), 'recognitions',
+                    file = os.path.join(ROOTDIR, 'datasets', str(self.name), 'recognitions',
                                         str(datetime.datetime.now().strftime('%d_%b  %H:%M'))+ '.csv')
                     with open(file, 'w') as f:
                         f.write(str(angles))
@@ -473,12 +479,46 @@ class Movement(Gesture):
 
 
 
+#call these functions to create a ne gestur/ movement
+# the func will collect angles from the webcam store them as csv and run the create pipe func from AI
+# with the csv
+def create_gesture(name, num_of_samples):
+
+
+    ges = Gesture(name = name)
+    ges.create_directory()
+    Movement.status = 2
+
+    cap = cv2.VideoCapture(0)
+    detector = hl.handDetector()
+    done = 0
+
+    while True:
+        success, img = cap.read()
+
+        img = cv2.flip(img, 1)
+
+        img, lmListR, lmListL, handedness = detector.get_info(img)
+
+        if len(lmListR) !=0 or len(lmListL)!=0:
+            if ges.start == False:
+                time.sleep(0.5)
+                #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
+                cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
+            done = ges.create_gesture(detector,num_of_samples=num_of_samples)
 
 
 
+        cv2.imshow('img', img)
+
+        if cv2.waitKey(1) & 0xFF==ord('q'):
+            break
+        if done==1:
+            break
 
 
-def create_movement(name):
+#same as create gesture will collect start gesture then end gesture
+def create_movement(name, num_of_samples):
 
 
     ges = Movement(name = name)
@@ -499,9 +539,9 @@ def create_movement(name):
         if len(lmListR) !=0 or len(lmListL)!=0:
             if ges.start == False:
                 time.sleep(0.5)
-                cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
-
-            done = ges.create_movement(detector)
+                #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
+                cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
+            done = ges.create_movement(detector,num_of_samples=num_of_samples)
 
 
 
@@ -510,15 +550,56 @@ def create_movement(name):
         if cv2.waitKey(1) & 0xFF==ord('q'):
             break
         if done==1:
-            cv2.imwrite(ROOTDIR + '/datasets/' + name + '/end_img.jpg', img)
+            cv2.imwrite(os.path.join(ROOTDIR, 'datasets', name, 'end_img.jpg'), img)
+            break
+
+
+
+#run this func to create a csv of generic hand gestures which will be used as the negative datasets of each gesture
+# and movement created
+
+#NOTE that running this file will discard the old one and create a new one
+def create_negatives(num_of_samples=1000):
+
+
+    ges = Gesture(name = 'negatives')
+
+
+
+    cap = cv2.VideoCapture(0)
+    detector = hl.handDetector()
+    done = 0
+
+    while True:
+        success, img = cap.read()
+
+        img = cv2.flip(img, 1)
+
+        img, lmListR, lmListL, handedness = detector.get_info(img)
+
+        if len(lmListR) !=0 or len(lmListL)!=0:
+
+            done = ges.create_negatives(detector, num_of_samples=num_of_samples)
+
+
+
+        cv2.imshow('img', img)
+
+        if cv2.waitKey(1) & 0xFF==ord('q'):
+            break
+        if done==1:
             break
 
 if __name__ == '__main__':
 
-    create_movement('air')
-    # ges = Movement(name='screw')
+    create_gesture('testges', num_of_samples=5)
+    #ges = Movement(name='screw')
     # ges.copy_negatives()
     # ges.train_model()
+
+
+
+    #create_negatives(num_of_samples=1000)
 
 
 

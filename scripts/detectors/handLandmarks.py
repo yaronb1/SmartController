@@ -296,23 +296,37 @@ class handDetector():
             y = self.lmList[p1][2] - self.lmList[p2][2]
             x = self.lmList[p1][1] - self.lmList[p2][1]
         elif self.hand == 'Left':
-            y = abs(self.lmListLeft[p1][2] - self.lmListLeft[p2][2])
-            x = abs(self.lmListLeft[p1][1] - self.lmListLeft[p2][1])
+            y =self.lmListLeft[p1][2] - self.lmListLeft[p2][2]
+            x = self.lmListLeft[p1][1] - self.lmListLeft[p2][1]
         else:
             x, y = 0, 0
 
 
 
+        if with_x_axis:
+            #angle = math.asin(y / h)
 
-        h = math.sqrt(y ** 2 + x ** 2)
+            try:
+                angle = math.atan(y/x)
 
-        if h > y and h > x:
-            if with_x_axis:
-                angle = math.asin(y / h)
-            else:
-                angle = math.asin(x / h)
-        else:
-            angle = -1
+                #first quad
+                if x>0 and y<0:
+                    angle = abs(angle)
+
+                #second quad
+                elif x<0 and y<0:
+                    angle = (-1*angle) + math.pi
+
+                #third quad
+                elif x<0 and y>0:
+                    angle = abs(angle) + math.pi
+
+
+                #fourth quad
+                elif x>0 and y>0:
+                    angle = (-1*angle)+ math.pi*2
+
+            except: angle =-1
 
         #print(x,y,h)
         return angle
@@ -536,13 +550,15 @@ if __name__ == "__main__":
 
         img, lmListR, lmListL, handedness = detector.get_info(img)
 
-        if len(lmListR)>0:
+
+        if len(lmListL)>0:
 
             p1,p2 = 8,6
 
             angle = detector.pointAngle(p1,p2)
 
-            print(int(math.degrees(angle)))
+            print(angle)
+            #print(int(math.degrees(angle)))
             #print(int(angle))
 
         cv2.imshow('img', img)

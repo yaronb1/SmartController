@@ -8,16 +8,22 @@ import cv2
 'strings of the  screens you want to create'
 SCREENS= ['one', 'two']
 
+#gestures and movement ar given as lists in the following format
+#('name of gesture', func, screen to add to)
 
+#if the func is move to a string- func should be given as a string - 'move 'name of screen''
 GESTURES = [
+    ('thumbs up', 'move two', 'one')
             ]
 
 MOVEMENTS =[
-        ('flash', lambda : print('flash'), 'one'),
-        ('snap', lambda : print('snap'), 'one'),
-        ('one', lambda: print('one'), 'one'),
+        ('gun', lambda : print('gun'), 'two'),
+
             ]
 
+
+def move_to_screen(controller,screen_name):
+    controller.move_to_screen(screen_name)
 
 
 '''
@@ -63,11 +69,16 @@ def create_screens():
 
 
 
-def create_gestures(sc_screens):
+def create_gestures(sc_screens, controllers):
 
     for ges in GESTURES:
-        g = Gesture(name = ges[0], func = ges[1])
-        sc_screens[ges[2]].add_gesture(g)
+        if ges[1][:4] == 'move':
+            screen_name = ges[1][5:]
+            g = Gesture(name=ges[0], func=lambda : controllers['sc'].move_to_screen(screen_name))
+            sc_screens[ges[2]].add_gesture(g)
+        else:
+            g = Gesture(name = ges[0], func = ges[1])
+            sc_screens[ges[2]].add_gesture(g)
 
     for m in MOVEMENTS:
         g = Movement(name = m[0], func = m[1])
@@ -82,7 +93,7 @@ def add_screens_to_controllers(sc_screens,controllers):
 def setup():
     controllers = create_controllers()
     screens = create_screens()
-    create_gestures(screens)
+    create_gestures(screens, controllers)
     add_screens_to_controllers(screens,controllers)
 
     return controllers

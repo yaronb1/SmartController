@@ -165,7 +165,7 @@ class Controller():
             self.x, self.y = x, y
 
             if len(self.capture) !=0:
-                cv2.imwrite(os.path.join(ROOTDIR, 'datasets', 'datasets', 'screenshots',str(datetime.datetime.now().strftime('%d_%m  %H:%M'))+self.capture+'.jpg'),img)
+                cv2.imwrite(os.path.join(ROOTDIR, 'datasets', 'screenshots',str(datetime.datetime.now().strftime('%d_%m  %H:%M'))+self.capture+'.jpg'),img)
                 self.capture=''
 
 
