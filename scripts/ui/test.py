@@ -5,14 +5,14 @@ import dill as pickle
 import scripts.detectors.handLandmarks as hl
 import UIMain as UI
 import time
-from scripts.controllers.Tuya import Controller as tuya
+from deprecated.Tuya import Controller as tuya
 
 from scripts.controllers.Spotify import Spotify
 
 
 
 from scripts.controllers.SocketController import PiController
-from scripts.detectors.Gestures import Movement, Gesture
+from scripts.detectors.Gestures import Movement
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 

@@ -2,33 +2,54 @@
 This class aims to give a convnient way to control the smart devices and their function
 
 '''
-import Tuya
+import time
+
+# import tinytuya
+import threading
+
 
 class Remote():
-    def __init__(self):
+    def __init__(self,
+                 devices= []):
 
-        self. devices ={
-            'BAR':{
-                'bar top':Tuya.CloudDevice(id='bf773c3578dcfd36e6c2tm'),
-                'bar bot left': Tuya.CloudDevice(id ='bfd40a82ebd4edd7489qsl' ),
-                'bar bot right': Tuya.CloudDevice(id = 'bfead50cf029f5ff14fh6u')
-            },
-
-            'GARDEN':[],
+        self.devices = devices
 
 
-        }
 
         self.selected_device = []
-        self.room= None
+        try:self.room = list(self.devices.keys())[0]
+        except: pass
+
+
+
+        self.adjuster = 0
+        self.prev_adjuster = 0
+
+        # should prevent the lag of the brightness
+
+    # by sending the cmd only every 100 adjusters
+    def smoothe_adjuster(self, adjuster):
+        print(f'joy value = {adjuster}')
+        if adjuster == 0:
+            self.adjuster = 0
+            self.prev_adjuster = 0
+
+        else:
+            self.adjuster += adjuster
+            self.adjuster = (self.adjuster // 100) * 100
+
+            if self.adjuster != self.prev_adjuster:
+                # print(f'adjuster  = {self.adjuster}  prev adjuster = {self.prev_adjuster}' )
+                self.prev_adjuster = self.adjuster
+                return self.adjuster
 
     def move_to_room(self, room):
         self.room = room
 
     def select_device(self, device_no):
 
-        if device_no=='ALL':
-            self.selected_device = list(self.devices[self.rooms].values())
+        if device_no == 'ALL':
+            self.selected_device = list(self.devices[self.room].values())
         else:
             self.selected_device = [list(self.devices[self.room].values())[device_no]]
             self.selected_device_name = list(self.devices[self.room].keys())[device_no]
@@ -44,24 +65,37 @@ class Remote():
 
     def toggle(self):
         for d in self.selected_device:
-            d.power(mode='toggle')
+            d.power('toggle')
 
     def adjust_brightness(self, adjuster):
+
         for d in self.selected_device:
+            # t1 = threading.Thread(target = d.adjust_brightness,args = [adjust])
             d.adjust_brightness(adjuster)
+            # t1.start()
 
-    def adjust_temp_colour(self, adjuster):
+    def set_brightness(self,brightness):
         for d in self.selected_device:
-            d.adjust_temp_colour(adjuster)
+            d.set_brightness(brightness)
 
 
-if __name__ == '__main__':
+    def adjust_temp_colour(self, adjuster, c=None):
 
-    remote = Remote()
+        for d in self.selected_device:
+            d.adjust_temp_colour(adjuster, c)
+            # t1 = threading.Thread(target = d.adjust_temp_colour,args = [adjust,c])
+            # t1.start()
 
-    remote.move_to_room('BAR')
+    def set_colour(self, hue):
+        for d in self.selected_device:
+            d.set_colour(hue)
 
-    remote.select_device(2)
+    def set_white(self, temp):
+        for d in self.selected_device:
+            d.set_white(temp)
 
-    print(remote.selected_device.id)
-    print(remote.selected_device_name)
+    def work_mode(self, mode='white'):
+
+        for d in self.selected_device:
+            d.work_mode(mode)
+

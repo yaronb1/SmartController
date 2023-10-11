@@ -177,7 +177,7 @@ class Gesture():
 
         return loaded_model
 
-    def create_gesture(self,detector, n =5, num_of_samples =200):
+    def create_gesture(self,detector, n =5, num_of_samples =200, new_ges=True):
         '''
         collects as many angle list as possible,
         collects NOT angle lists
@@ -191,7 +191,8 @@ class Gesture():
 
 
         if self.start == False:
-            self.create_new_file()
+            if new_ges:
+                self.create_new_file()
             self.start = True
             self.samples = 0
             self.status = 2  # start ges
@@ -217,8 +218,8 @@ class Gesture():
 
 
 
-
-                self.copy_negatives()
+                if new_ges:
+                    self.copy_negatives()
                 self.train_model()
                 return 1  # done
 
@@ -377,6 +378,7 @@ class Movement(Gesture):
              args=[],
              timer = 0.5,
              name='',
+             reverse= False,
                  ):
 
         super(Movement, self).__init__(name=name)
@@ -390,7 +392,9 @@ class Movement(Gesture):
         self.args=args
         self.name = name
 
-    def create_movement(self, detector, n=5, num_of_samples=200):
+        self.reverse_movement= reverse
+
+    def create_movement(self, detector, n=5, num_of_samples=200, new_ges=True):
         '''
 
 
@@ -401,7 +405,8 @@ class Movement(Gesture):
         '''
 
         if self.start == False:
-            self.create_new_file()
+            if new_ges:
+                self.create_new_file()
             self.start = True
             self.samples = 0
             self.status = 2  # start ges
@@ -433,7 +438,8 @@ class Movement(Gesture):
                     return 0
 
                 if self.status == 3:
-                    self.copy_negatives()
+                    if new_ges:
+                        self.copy_negatives()
                     self.train_model()
                     return 1  # done
 
@@ -449,15 +455,22 @@ class Movement(Gesture):
 
         result = self.model.predict(np.array([angles]))[0]
 
+        if self.reverse_movement:
+            s = '_end'
+            e = '_start'
+        else:
+            s = '_start'
+            e = '_end'
+
         #print(self.end_ges.name)
-        if result == self.name +'_start':
+        if result == str(self.name +s):
             self.started = True
             self.start_time = time.time()
 
         if self.started:
             now = time.time()
             self.elapsed = now - self.start_time
-            if self.elapsed < self.timer and result == self.name+'_end':
+            if self.elapsed < self.timer and result == str(self.name+e):
                 self.started = False
                 self.elapsed = 0
                 try:
@@ -468,6 +481,7 @@ class Movement(Gesture):
                     with open(file, 'w') as f:
                         f.write(str(angles))
                 except Exception as e: print(e)
+                print(self.name)
                 return True
 
             if self.elapsed > self.timer:
@@ -485,8 +499,12 @@ class Movement(Gesture):
 def create_gesture(name, num_of_samples):
 
 
+    new_ges = not(os.path.isdir(os.path.join(ROOTDIR,'datasets', str(name))))
+    print(new_ges)
     ges = Gesture(name = name)
-    ges.create_directory()
+
+    if new_ges:
+        ges.create_directory()
     Movement.status = 2
 
     cap = cv2.VideoCapture(0)
@@ -502,10 +520,11 @@ def create_gesture(name, num_of_samples):
 
         if len(lmListR) !=0 or len(lmListL)!=0:
             if ges.start == False:
-                time.sleep(0.5)
+                time.sleep(1)
                 #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
-                cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
-            done = ges.create_gesture(detector,num_of_samples=num_of_samples)
+                if new_ges:
+                    cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
+            done = ges.create_gesture(detector,num_of_samples=num_of_samples,new_ges=new_ges)
 
 
 
@@ -520,9 +539,11 @@ def create_gesture(name, num_of_samples):
 #same as create gesture will collect start gesture then end gesture
 def create_movement(name, num_of_samples):
 
-
+    new_ges = not (os.path.isdir(os.path.join(ROOTDIR, 'datasets', str(name))))
+    print(new_ges)
     ges = Movement(name = name)
-    ges.create_directory()
+    if new_ges:
+        ges.create_directory()
     Movement.status = 2
 
     cap = cv2.VideoCapture(0)
@@ -538,10 +559,11 @@ def create_movement(name, num_of_samples):
 
         if len(lmListR) !=0 or len(lmListL)!=0:
             if ges.start == False:
-                time.sleep(0.5)
+                time.sleep(1)
                 #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
-                cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
-            done = ges.create_movement(detector,num_of_samples=num_of_samples)
+                if new_ges:
+                    cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
+            done = ges.create_movement(detector,num_of_samples=num_of_samples, new_ges=new_ges)
 
 
 
@@ -550,7 +572,8 @@ def create_movement(name, num_of_samples):
         if cv2.waitKey(1) & 0xFF==ord('q'):
             break
         if done==1:
-            cv2.imwrite(os.path.join(ROOTDIR, 'datasets', name, 'end_img.jpg'), img)
+            if new_ges:
+                cv2.imwrite(os.path.join(ROOTDIR, 'datasets', name, 'end_img.jpg'), img)
             break
 
 

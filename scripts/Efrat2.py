@@ -1,28 +1,21 @@
-import datetime
-import multiprocessing
-import tkinter as tk
 import threading
 
 
 import cv2
 import time
-import scripts.detectors.handLandmarks as hl  # imports the module we have written
 
 try:from win32api import GetSystemMetrics
 except: pass
 
 import scripts.controllers.SmartController as sc
-from scripts.detectors.Gestures import Gesture, Movement
-from scripts.controllers.Tuya import Controller as tuyacontroller
+from scripts.detectors.Gestures import Movement
+from deprecated.Tuya import Controller as tuyacontroller
 from scripts.controllers.youTube import youTubeController
 import scripts.detectors.handLandmarks as hl
 import numpy as np
 import scripts.ui.UIMain as UI
 
-from scripts.controllers.SocketController import PiController as BarController
-
 import os
-import Speech
 
 #ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 from definitions.config import ROOTDIR

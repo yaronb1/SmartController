@@ -81,6 +81,7 @@ class Controller():
                  screen_dict = {},
                  web_object =None,
                  csn = '',
+                 view_webcam = False,
                  ):
 
         self.screen_dict = screen_dict
@@ -89,7 +90,7 @@ class Controller():
         self.web_object=web_object
         self.idle=True
         self.capture = ''
-
+        self.view_webcam = view_webcam
         
     
     '''
@@ -160,7 +161,8 @@ class Controller():
                         (0, 0, 0), 1)
 
 
-            #cv2.imshow('img', img)
+            if self.view_webcam:
+                cv2.imshow('img', img)
             cv2.imshow('bg', bg)
             self.x, self.y = x, y
 

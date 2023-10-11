@@ -12,7 +12,7 @@ import scripts.controllers.SmartController as sc
 from scripts.detectors.Gestures import Gesture, Movement
 
 import pickle
-from scripts.controllers.Tuya import Controller as tuya_controller
+from deprecated.Tuya import Controller as tuya_controller
 
 
 import alsaaudio
