@@ -1,5 +1,9 @@
 #write your functions here
 #we will use the name in the setup module to call the functions
+#all functions will get a lsit as argument or no argument at all
+# when passing argument in the setup module sepearte them using space
+
+# func- test arg1 arg2
 
 
 

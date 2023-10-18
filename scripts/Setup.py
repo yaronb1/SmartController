@@ -3,36 +3,41 @@ from scripts.ui import UIMain as UI
 from scripts.detectors import handLandmarks as hl
 from scripts.detectors.Gestures import Gesture, Movement
 import cv2
-from scripts.controllers import Tuya
-from scripts.controllers import Remote
-
-#from definitions.TuyaDevices import LOCAL_DEVICES
 
 
-tuya_devices = {'LIVING ROOM':{}}
-#tuya_devices = LOCAL_DEVICES
+
+from scripts.methods import TuyaMethods
+
 
 'strings of the  screens you want to create'
 SCREENS= ['one', 'two']
 
 #gestures and movement ar given as lists in the following format
-#('name of gesture', func, screen to add to)
+#('name of gesture', func args1 arg2 , screen to add to)
+from scripts.methods import Methods
 
-#if the func is move to a string- func should be given as a string - 'move 'name of screen''
-# func is power format - 'tuya power {mode}' turn on , turn off, toggle
-#func is change work mode - 'tuya mode {mode}' white, colour
+#funcs should be given as string
+#and will be taken from the Methods module
+#just name the function you have declared in the Methods module and pass anyargument each seperated by spaces
+#the mmenthods in methods module must get a list as argument or no argument at all
+# test arg1 arg2
+
+#if you are taking methods from the TuyaMethods modlue start the string with - tuya : 'tuya func args'
 GESTURES = [
-    ('thumbs up', 'move two', 'one')
+    ('thumbs up', 'test hello yes', 'one')
             ]
 
 MOVEMENTS =[
-        ('fan_right', lambda : print('snap'), 'one'),
-        # ('right_fan','tuya power turn off','one', 'reverse'), #all off
-        # ('right_fan', 'tuya power turn on', 'one'),#all on
-        # ('gun', 'tuya brightness 10', 'one'),# dim all the lights
-        # ('gun', 'tuya brightness 1000', 'one','reverse'),#brihgtnes all lights
-        # ('flash', 'tuya mode colour', 'one'),#switch to colour mode
-        # ('snap', 'tuya mode white', 'one'), #switch to white mode
+
+
+    #('gun', 'tuya test hello', 'one')
+        #('fan_right', lambda : print('snap'), 'one'),
+        ('right_fan','tuya turn off','one', 'reverse'), #all off
+        ('right_fan', 'tuya turn on', 'one'),#all on
+        ('gun', 'tuya brightness 10', 'one'),# dim all the lights
+        ('gun', 'tuya brightness 1000', 'one','reverse'),#brihgtnes all lights
+        ('flash', 'tuya mode colour', 'one'),#switch to colour mode
+        ('snap', 'tuya mode white', 'one'), #switch to white mode
 
 
 
@@ -43,16 +48,9 @@ def move_to_screen(controller,screen_name):
     controller.move_to_screen(screen_name)
 
 
-# used to create the relveant functions based on the text func passed
-#the text must be given as the second item in the ges/move list
+#functions will be derived from the methods module
+# there you can type up your methods to be called with lists as argumetns or no arguments
 
-#options -
-#           move to screen = 'move {name of screen}'
-#           power options = 'tuya power {option}' - turn on, turn on, toggle
-#           switch mode   = 'tuya mode {mode}' - white, colour
-#           set brightness= 'tuya brightness {brightness}' 10<brightness<1000
-#           set hue(colour)= 'tuya colour {hue}' 10<hue<1000
-#           set temp(white)= 'tuya white {temp}' 10<temp<1000
 def funcs(func_txt, controllers):
     if func_txt[:4] == 'move':
         screen_name = func_txt[5:]
@@ -61,47 +59,30 @@ def funcs(func_txt, controllers):
 
 
 
-    # using text for tuya commands taken from remote class and tuya class
-    elif func_txt[:4] == 'tuya':
-
-        # power options
-        if func_txt[5:10] == 'power':
-            if func_txt[11:] == 'turn off':
-                func=controllers['tuya'].turn_off
-                return func
-
-            elif func_txt[11:] == 'turn on':
-                func=controllers['tuya'].turn_on
-                return func
-
-            elif func_txt[11:] == 'toggle':
-                func=controllers['tuya'].toggle
-                return func
-
-        elif func_txt[5:9] == 'mode':
-            mode = func_txt[10:]
-            func=lambda: controllers['tuya'].work_mode(mode)
-            return func
-
-        elif func_txt[5:15]=='brightness':
-            brightness = int(func_txt[16:])
-            func = lambda :controllers['tuya'].set_brightness(brightness)
-            return func
-
-        elif func_txt[5:11]=='colour':
-            hue = int(func_txt[12:])
-            func = lambda: controllers['tuya'].set_colour(hue)
-            return func
-
-        elif func_txt[5:10]=='white':
-            temp = int(func_txt[11:])
-            func = lambda : controllers['tuya'].set_white(temp)
-            return func
 
 
 
-def tuya_control():
-    pass
+    else:
+        x = func_txt.split()
+
+        if x[0]=='tuya':
+            func = getattr(TuyaMethods, x[1])
+            try:
+                args = x[2:]
+            except:
+                return lambda : func()
+            else:
+                return lambda : func(args)
+
+        else:
+
+            func = getattr(Methods, x[0])
+            try:
+                args = x[1:]
+            except:
+                return lambda : func()
+            else:
+                return lambda : func(args)
 
 
 
@@ -120,9 +101,9 @@ def create_controllers():
     logic_controller = sc.Controller(view_webcam=True)
     detector= hl.handDetector()
     ui_controller = UI.Controller()
-    tuya_remote = Remote.Remote(devices=tuya_devices)
+    #tuya_remote = Remote.Remote(devices=tuya_devices)
 
-    tuya_remote.select_device('ALL')
+    #tuya_remote.select_device('ALL')
 
     cap = cv2.VideoCapture(0)
 
@@ -132,7 +113,7 @@ def create_controllers():
         'detector': detector,
         'ui': ui_controller,
         'cap': cap,
-        'tuya':tuya_remote,
+        #'tuya':tuya_remote,
 
     }
 

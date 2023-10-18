@@ -6,28 +6,14 @@ import tinytuya
 
 import re
 
+from definitions.TuyaDevices import CLOUD_DEVICES, CLOUD_CREDENTIALS
+
 class Controller():
     #   outletdevice(deviceid, ip, localkey)
     cv=0
     pv=0
 
-    cloud_devices = {
-        'device name': 'id',
-        'kitchen': "64560500ecfabc7b40e1",
-        'bar bot right': 'bfead50cf029f5ff14fh6u',
-        'bar bot left': 'bfd40a82ebd4edd7489qsl',
-        'bar top': 'bf773c3578dcfd36e6c2tm',
-        'Aqua lamp': 'bf34bfbf3fbacd9f8fu3vs',
-        'living room': '107586368caab5df06de',
-        'Smart IR': 'bfa29112b2eb1242967nhv',
-        'heater' : 'bf7757111274e8df019rgw',
-        'our heater': 'bf88f8d9637a6209cclukv',
-        'night light': 'bf40667rf70c9sae',
-        'tester plug' : '246014102462ab4189a6',
-        'Air' : 'bfd2790ca058137e1dgnst',
-        'Audio' : 'bfd79969c065b03be3zwzi',
 
-    }
 
 
 
@@ -58,12 +44,18 @@ class Controller():
 
     def cloud_connect(self):
 
+        self.cloud_devices = CLOUD_DEVICES
+
+        region = CLOUD_CREDENTIALS['apiRegion']
+        key = CLOUD_CREDENTIALS['apiKey']
+        secret = CLOUD_CREDENTIALS['apiSecret']
+        device = CLOUD_CREDENTIALS['apiDeviceID']
         try:
             self.cloud = tinytuya.Cloud(
-                apiRegion="eu",
-                apiKey="uf9snq4abh36n6uvprts",
-                apiSecret="5f47cde0092c4ec59207fd6f1ba29208",
-                apiDeviceID="bf773c3578dcfd36e6c2tm")
+                apiRegion = region,
+                apiKey=key,
+                apiSecret=secret,
+                apiDeviceID=device)
         except: print('couldnt connect to tuya cloud')
 
 
