@@ -1,1 +1,1 @@
-# PiController
+The smartcontroller is designed to recognise hand gesture from the user to perform certain task such as controlling a smart home, controlling media(youtube, netflix, etc.) and controlling powerpoint presentations without the need for a remote.
