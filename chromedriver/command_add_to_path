@@ -1,9 +1,0 @@
-// Move file to a directory that's not in PATH
-mv ~/Downloads/chromedriver ~/home/yaron/Desktop/p/chromedriver
-
-// Make file executable
-sudo chmod +x ~/Desktop/p/chromedriver/chromedriver
-
-// Add directory to PATH
-sudo echo 'export PATH="$HOME/Desktop/p/chromedriver:$PATH"' >> ~/.profile
-source ~/.profile
