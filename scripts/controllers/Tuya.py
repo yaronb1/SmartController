@@ -574,7 +574,12 @@ class LocalDevice(Controller):
 
 if __name__ == "__main__":
 
+    d = LocalDevice(
+    id= 'bfbf2f21a06fc00973hnrs',
+    ip= '192.168.43.156',
+    key= 'tC#01M!LV!$SaVBC',
+    version= 3.3,)
 
-    t =CloudDevice(id ='bf773c3578dcfd36e6c2tm')
+    print (d.device.state())
     
     

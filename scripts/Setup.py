@@ -1,20 +1,27 @@
+import os
+
 from scripts.controllers import SmartController as sc
-from scripts.ui import UIMain as UI
+
 from scripts.detectors import handLandmarks as hl
 from scripts.detectors.Gestures import Gesture, Movement
 import cv2
 
+from definitions.config import ROOTDIR
 
 
+from scripts.methods import Methods
 from scripts.methods import TuyaMethods
 
+
+TuyaCommander = TuyaMethods.Commander()
+CustomCommander = Methods.Commander()
 
 'strings of the  screens you want to create'
 SCREENS= ['one', 'two']
 
 #gestures and movement ar given as lists in the following format
 #('name of gesture', func args1 arg2 , screen to add to)
-from scripts.methods import Methods
+
 
 #funcs should be given as string
 #and will be taken from the Methods module
@@ -24,20 +31,20 @@ from scripts.methods import Methods
 
 #if you are taking methods from the TuyaMethods modlue start the string with - tuya : 'tuya func args'
 GESTURES = [
-    ('thumbs up', 'test hello yes', 'one')
+    #('thumbs up', 'test hello yes', 'one')
             ]
 
 MOVEMENTS =[
 
 
-    #('gun', 'tuya test hello', 'one')
-        #('fan_right', lambda : print('snap'), 'one'),
-        ('right_fan','tuya turn off','one', 'reverse'), #all off
-        ('right_fan', 'tuya turn on', 'one'),#all on
-        ('gun', 'tuya brightness 10', 'one'),# dim all the lights
-        ('gun', 'tuya brightness 1000', 'one','reverse'),#brihgtnes all lights
-        ('flash', 'tuya mode colour', 'one'),#switch to colour mode
-        ('snap', 'tuya mode white', 'one'), #switch to white mode
+    # #('gun', 'tuya test hello', 'one')
+    #     #('fan_right', lambda : print('snap'), 'one'),
+    #     ('right_fan','tuya turn_off','one', 'reverse'), #all off
+    #     ('right_fan', 'tuya turn_on', 'one'),#all on
+    #     ('gun', 'tuya brightness 10', 'one'),# dim all the lights
+    #     ('gun', 'tuya brightness 1000', 'one','reverse'),#brihgtnes all lights
+    #     ('flash', 'tuya mode colour', 'one'),#switch to colour mode
+    #     ('snap', 'tuya mode white', 'one'), #switch to white mode
 
 
 
@@ -64,25 +71,26 @@ def funcs(func_txt, controllers):
 
     else:
         x = func_txt.split()
+        print(x)
 
         if x[0]=='tuya':
-            func = getattr(TuyaMethods, x[1])
-            try:
-                args = x[2:]
-            except:
-                return lambda : func()
-            else:
-                return lambda : func(args)
 
-        else:
-
-            func = getattr(Methods, x[0])
             try:
-                args = x[1:]
+                args = x[2]
             except:
-                return lambda : func()
+                return lambda : TuyaCommander.__getattribute__(x[1])()
             else:
-                return lambda : func(args)
+                return lambda : TuyaCommander.__getattribute__(x[1])(args)
+
+        elif x[0]=='custom':
+
+
+            try:
+                args = x[2]
+            except:
+                return lambda : CustomCommander.__getattribute__(x[1])()
+            else:
+                return lambda : CustomCommander.__getattribute__(x[1])(args)
 
 
 
@@ -100,10 +108,8 @@ def create_controllers():
 
     logic_controller = sc.Controller(view_webcam=True)
     detector= hl.handDetector()
-    ui_controller = UI.Controller()
-    #tuya_remote = Remote.Remote(devices=tuya_devices)
 
-    #tuya_remote.select_device('ALL')
+
 
     cap = cv2.VideoCapture(0)
 
@@ -111,9 +117,10 @@ def create_controllers():
     controllers = {
         'sc': logic_controller,
         'detector': detector,
-        'ui': ui_controller,
         'cap': cap,
-        #'tuya':tuya_remote,
+
+
+
 
     }
 
@@ -162,7 +169,7 @@ def create_gestures(sc_screens, controllers):
 
         mvnt = Movement(name=m[0], func=func, reverse=reverse)
         mvnt.timer=1
-        sc_screens[m[2]].add_gesture(mvnt)
+        sc_screens['one'].add_gesture(mvnt)
 
 
 
@@ -187,28 +194,157 @@ def start(controllers):
 
 
 if __name__ == '__main__':
-    controllers = setup()
-    start(controllers)
+    #controllers = setup()
+    #start(controllers)
 
 
-'''
-UI
+    '''
+    UI
+    
+    CONNECT TO DEVICES
+    
+    have a checklist of available devices to connect to
+    divided into rooms
+    connect button
+    
+    green/red symbol to show connection
+    
+    
+    SCREENS
+    
+    number of screens 
+    names of each screen
+    
+    GESTURES/ MOVEMENT
+    
+    eache ges must be named(preferably dropdown) func and screen (preferably all scrolldowns)
+    '''
 
-CONNECT TO DEVICES
 
-have a checklist of available devices to connect to
-divided into rooms
-connect button
-
-green/red symbol to show connection
+    from tkinter import *
+    from definitions.TuyaDevices import LOCAL_DEVICES
 
 
-SCREENS
 
-number of screens 
-names of each screen
+    def submit():
+        Label(text=f'gesture - {ges_clicked.get()}').pack()
+        Label(text= f'function - {func_clicked.get()}').pack()
+        Label(text = f'args - {args.get()}').pack()
 
-GESTURES/ MOVEMENT
+        if os.path.exists(os.path.join(ROOTDIR,'datasets', ges_clicked.get(), 'end_img.jpg')):
+            MOVEMENTS.append((ges_clicked.get(), command_type.get() + ' ' +func_clicked.get() + ' ' +  args.get(), 'one'))
 
-eache ges must be named(preferably dropdown) func and screen (preferably all scrolldowns)
-'''
+        else:
+            GESTURES.append((ges_clicked.get(), command_type.get() + ' ' +func_clicked.get() + ' ' +  args.get(), 'one'))
+
+        print(f'gesture : {GESTURES}')
+        print(f'movements - {MOVEMENTS}')
+
+
+    def run():
+        controllers = setup()
+        start(controllers)
+
+
+    def change_options(*args):
+        if command_type.get()=='tuya':
+            tuya_drop.pack()
+            func_drop.pack_forget()
+
+        elif command_type.get()== 'custom':
+            func_drop.pack()
+            tuya_drop.pack_forget()
+
+
+    def add_device():
+        for i in devices_to_connect:
+            print(i.get())
+
+    def connect_devices():
+        devices_dict = {}
+
+
+        for room in LOCAL_DEVICES:
+            devices_dict[room] = {}
+            for d in devices_to_connect:
+
+                if d.get() in LOCAL_DEVICES[room]:
+
+                    devices_dict[room][d.get()] = LOCAL_DEVICES[room][d.get()]
+
+        connect_devices = TuyaCommander.connect_local_devices(devices_dict)
+
+
+
+
+
+
+    root = Tk()
+
+    devices_to_connect = []
+    # tuya devices checkbox and connect
+
+    for room, devices_dict in LOCAL_DEVICES.items():
+        Label(text = room).pack()
+
+        for name, device_info in devices_dict.items():
+            var = Variable()
+            c1 = Checkbutton(root, text=name, variable=var, onvalue=name, offvalue='', command=add_device)
+            c1.pack()
+            devices_to_connect.append(var)
+
+    connect = Button(root,text='CONNECT DEVICES', command=connect_devices)
+    connect.pack()
+
+    #SELECT YOUR GESTURE
+    ges_options = os.listdir(os.path.join(ROOTDIR, 'datasets'))
+    ges_options.remove('negatives')
+    ges_options.remove('old')
+    ges_options.remove('screenshots')
+
+    # datatype of menu text
+    ges_clicked = StringVar()
+    args= StringVar()
+
+    # initial menu text
+    ges_clicked.set("Slect Your Gesture")
+
+    # Create Dropdown menu
+    ges_drop = OptionMenu(root, ges_clicked, *ges_options)
+    ges_drop.pack()
+
+
+    #SELECT YOUR FUNCTIONS
+
+    func_options = [method for method in dir(Methods.Commander) if method.startswith('__') is False]
+    tuya_options = [method for method in dir(TuyaMethods.Commander) if method.startswith('__')is False]
+
+    command_options = ['tuya', 'custom']
+    command_type=StringVar()
+    command_drop = OptionMenu(root,command_type,*command_options,command=change_options)
+    command_drop.pack()
+
+    func_clicked = StringVar()
+    func_clicked.set('Select you Function')
+
+    func_drop = OptionMenu(root, func_clicked, *func_options)
+    tuya_drop = OptionMenu(root,func_clicked,*tuya_options)
+    func_drop.pack()
+
+    Label(root, text='enter your arguments').pack()
+    args_box = Entry(root, textvariable=args)
+    args_box.pack()
+
+
+    #ADD gesture
+    add = Button(text = 'ADD GESTURE', command=submit).pack()
+
+
+    start_button = Button(text='START', command=run)
+    start_button.pack()
+
+    root.mainloop()
+
+
+
+

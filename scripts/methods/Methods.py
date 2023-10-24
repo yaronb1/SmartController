@@ -6,17 +6,23 @@
 # func- test arg1 arg2
 
 
+class Commander:
+    def test(self,args):
 
-def test(args):
-
-    #print(args)
-    print(f'test function called with {args[0]} variable and {args[1]} avriable')
+        #print(args)
+        print(f'test function called with {args} variable ')
 
 
 if __name__=='__main__':
 
-    import Methods
-    test = getattr(Methods, 'test')
+    # import Methods
+    # test = getattr(Methods, 'test')
+    #
+    # f = lambda  :test()
+    # f()
 
-    f = lambda  :test('heoll')
-    f()
+    cmd = Commander()
+    method_list = [method for method in dir(Commander) if method.startswith('__') is False]
+    print(method_list)
+
+

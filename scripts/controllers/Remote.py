@@ -50,9 +50,10 @@ class Remote():
 
         if device_no == 'ALL':
             self.selected_device = list(self.devices[self.room].values())
+            print(self.selected_device)
         else:
-            self.selected_device = [list(self.devices[self.room].values())[device_no]]
-            self.selected_device_name = list(self.devices[self.room].keys())[device_no]
+            self.selected_device = [list(self.devices[self.room].values())][device_no]
+            self.selected_device_name = [list(self.devices[self.room].keys())][device_no]
 
     def turn_off(self):
 
