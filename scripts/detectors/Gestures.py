@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
+import pandas as pd
 
-from scripts import AI
+from scripts.Ai_Data import AI
 import scripts.detectors.handLandmarks as hl
 
 import pickle
@@ -10,13 +11,16 @@ import csv
 
 import time
 
-import collections
 import os
 import datetime
 #ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 from definitions.config import ROOTDIR
 
-
+HEADERS = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
+           'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13',
+           'ring 13 -14',
+           'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20',
+           ]
 class Gesture():
     '''
     This class aims to capture a gesture made by the user, save it and then compare gestures captured from the webcam
@@ -160,9 +164,11 @@ class Gesture():
 
     def train_model(self):
         #data_file = self.path +str(self.name)
-        data_file = os.path.join(self.path,self.name)
+        data_file = os.path.join(self.path,self.name+'.csv')
+        data = pd.read_csv(data_file)
 
-        AI.create_pipe(data_file)
+
+        AI.create_pipe(data, name=self.name)
 
     def load_model(self, file_path=''):
         try:
@@ -289,12 +295,16 @@ class Gesture():
                     try:
                         # func to save angle list and collect data
                         #file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
-                        file = os.path.join(ROOTDIR,'datasets', str(self.name),'recognitions', str(datetime.datetime.now().strftime('%d_%b - %H:%M'))+'.csv')
+                        file = os.path.join(ROOTDIR,'datasets', str(self.name),'recognitions', str(datetime.datetime.now().strftime('%d_%b-%H_%M'))+'.csv')
                         with open(file, 'w') as f:
-                            f.write(str(angles))
+                            writer = csv.writer(f)
+                            writer.writerow(HEADERS)
+                            writer.writerow(angles)
+                            #f.write(str(angles))
                     except Exception as e:
                         print(e)
 
+                    print(self.name)
                     return True
             else:
                 self.started = True
@@ -477,9 +487,12 @@ class Movement(Gesture):
                     # func to save angle list and collect data
                     #file = ROOTDIR + '/datasets/' + str(self.name) + '/' + str(datetime.datetime.now()) + '.csv'
                     file = os.path.join(ROOTDIR, 'datasets', str(self.name), 'recognitions',
-                                        str(datetime.datetime.now().strftime('%d_%b  %H:%M'))+ '.csv')
+                                        str(datetime.datetime.now().strftime('%d_%b-%H_%M'))+ '.csv')
                     with open(file, 'w') as f:
-                        f.write(str(angles))
+                        writer = csv.writer(f)
+                        writer.writerow(HEADERS)
+                        writer.writerow(angles)
+                        #f.write(str(angles))
                 except Exception as e: print(e)
                 print(self.name)
                 return True
@@ -615,7 +628,7 @@ def create_negatives(num_of_samples=1000):
 
 if __name__ == '__main__':
 
-    create_gesture('testges', num_of_samples=5)
+    create_movement('tges', num_of_samples=5)
     #ges = Movement(name='screw')
     # ges.copy_negatives()
     # ges.train_model()

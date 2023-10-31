@@ -119,56 +119,63 @@ class Controller():
 
 
             success, img = cap.read()
-            img = cv2.flip(img, 1)
 
-            self.img, self.lmListR, self.lmListL, self.handedness = detector.get_info(img)
+            if success:
+                img = cv2.flip(img, 1)
 
-
-            if len(self.lmListR) != 0 or len(self.lmListL) != 0:
-                # cv2.circle(img, (400, 400), 50, (0, 255, 0), -1)
-                # fingers = detector.fingerCounter()
-                bg[:, :, 1] = 255
-                bg[:, :, 2] = 0
+                self.img, self.lmListR, self.lmListL, self.handedness = detector.get_info(img)
 
 
-                if self.handedness == 'Right':
-                    x, y = self.lmListR[8][1], self.lmListR[8][2]
+                if len(self.lmListR) != 0 or len(self.lmListL) != 0:
+                    # cv2.circle(img, (400, 400), 50, (0, 255, 0), -1)
+                    # fingers = detector.fingerCounter()
+                    bg[:, :, 1] = 255
+                    bg[:, :, 2] = 0
 
 
-                elif self.handedness == 'Left':
-                    x, y = self.lmListL[8][1], self.lmListL[8][2]
+                    if self.handedness == 'Right':
+                        x, y = self.lmListR[8][1], self.lmListR[8][2]
+
+
+                    elif self.handedness == 'Left':
+                        x, y = self.lmListL[8][1], self.lmListL[8][2]
+
+                    else:
+                        x, y = 0, 0
+
 
                 else:
                     x, y = 0, 0
+                    bg[:, :, 2] = 255
+                    bg[:, :, 1] = 0
+                self.run([], detector, x, y)
 
+
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    break
+
+                cTime = time.time()
+                fps = 1 / (cTime - pTime)
+                pTime = cTime
+                cv2.putText(bg, str(int(fps)), (10, 40), cv2.FONT_HERSHEY_COMPLEX, 1,
+                            (0, 0, 0), 1)
+
+
+                if self.view_webcam:
+                    cv2.imshow('img', img)
+                cv2.imshow('bg', bg)
+                self.x, self.y = x, y
+
+                if len(self.capture) !=0:
+                    cv2.imwrite(os.path.join(ROOTDIR, 'datasets', 'screenshots',str(datetime.datetime.now().strftime('%d_%b-%H_%M'))+self.capture+'.jpg'),img)
+                    self.capture=''
 
             else:
-                x, y = 0, 0
-                bg[:, :, 2] = 255
-                bg[:, :, 1] = 0
-            self.run([], detector, x, y)
-
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                cap.release()
-                cv2.destroyAllWindows()
-                break
-
-            cTime = time.time()
-            fps = 1 / (cTime - pTime)
-            pTime = cTime
-            cv2.putText(bg, str(int(fps)), (10, 40), cv2.FONT_HERSHEY_COMPLEX, 1,
-                        (0, 0, 0), 1)
-
-
-            if self.view_webcam:
-                cv2.imshow('img', img)
-            cv2.imshow('bg', bg)
-            self.x, self.y = x, y
-
-            if len(self.capture) !=0:
-                cv2.imwrite(os.path.join(ROOTDIR, 'datasets', 'screenshots',str(datetime.datetime.now().strftime('%d_%m  %H:%M'))+self.capture+'.jpg'),img)
-                self.capture=''
+                time.sleep(1)
+                controllers['cap'] = cv2.VideoCapture(0)
+                cap = controllers['cap']
 
 
     """

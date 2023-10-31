@@ -1,6 +1,6 @@
 import os.path
 import numpy as np
-import csv
+
 
 import pandas as pd
 import sklearn
@@ -12,24 +12,17 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 import pickle
 
-from sklearn.pipeline import Pipeline
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OrdinalEncoder
-from sklearn.preprocessing import KBinsDiscretizer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.preprocessing import QuantileTransformer
-from sklearn.preprocessing import RobustScaler
-from sklearn.preprocessing import LabelBinarizer
+
 from sklearn.preprocessing import Normalizer
-from sklearn.neighbors import LocalOutlierFactor
-
-import scripts.detectors.Gestures
 
 
-ROOTDIR = os.path.dirname(os.path.abspath(__file__))
+from matplotlib import pyplot as plt
+
+
+from definitions.config import ROOTDIR
 
 models = {
     'logistic regression' : LogisticRegression,
@@ -39,13 +32,13 @@ models = {
 }
 
 
-def create_pipe(file_name, save=True, model_to_use='logistic regression',name='' ):
-    data_file = str(file_name) + '.csv'
-    data = pd.read_csv(data_file)
+def create_pipe(data, save=True, model_to_use='logistic regression',name='' ):
+    # data_file = str(file_name) + '.csv'
+    # data = pd.read_csv(data_file)
 
 
     # Pandas ".iloc" expects row_indexer, column_indexer
-    X = data.iloc[:, :-1].values
+    X = data.iloc[:, :-1]
     # Now let's tell the dataframe which column we want for the target/labels.
     y = data['gesture']
 
@@ -67,19 +60,22 @@ def create_pipe(file_name, save=True, model_to_use='logistic regression',name=''
     model_prediction = pipe.predict(X_test)
 
     if save:
-        model_name = str(file_name) + '_finalized_pipe_'+ name +'.sav'
+        model_name = os.path.join(ROOTDIR,'datasets',name,'_finalized_pipe_.sav')
+        #model_name = str(file_name) + '_finalized_pipe_'+ name +'.sav'
         pickle.dump(pipe, open(model_name, 'wb'))
+
+    else: return pipe
 
 
     print(classification_report(model_prediction, y_test))
 
 
-def create_model(file_name, save = True, model_to_use= 'logistic regression',name=''):
+def create_model(data, save = True, model_to_use= 'logistic regression',name=''):
 
 
 
-    data_file = str(file_name) + '.csv'
-    data = pd.read_csv(data_file)
+    # data_file = str(file_name) + '.csv'
+    # data = pd.read_csv(data_file)
 
 
 
@@ -88,7 +84,7 @@ def create_model(file_name, save = True, model_to_use= 'logistic regression',nam
     #print(data.head(5))
 
     # Pandas ".iloc" expects row_indexer, column_indexer
-    X = data.iloc[:,:-1].values
+    X = data.iloc[:,:-1]
     # Now let's tell the dataframe which column we want for the target/labels.
     y = data['gesture']
 
@@ -127,8 +123,10 @@ def create_model(file_name, save = True, model_to_use= 'logistic regression',nam
 
 
     if save:
-        model_name = str(file_name) + '_finalized_model' + name + '.sav'
+        #model_name = str(file_name) + '_finalized_model' + name + '.sav'
+        model_name = os.path.join(ROOTDIR, 'datasets', name, '_finalized_model_.sav')
         pickle.dump(model, open(model_name, 'wb'))
+    else: return model
 
 
     # Accuracy score is the simplest way to evaluate
@@ -228,14 +226,19 @@ def model_metric(model_file,data_file, *args):
 
 
 
+#the function is designed to test a model that has been altered
+# we will put into various data that has been collected
+#the functions takes data that has been collected(NOT THE DATA USED TO CREATE THE MODEL)
+# that is eperated into true recog and false recogs.
+# the true recogs must stay the same and false recogs must be seen as false t
+#this will show if the altered model is better or worse than the original one
 
-
-def test_model(model_file, true_folder, false_folder):
+def test_model(model, true_folder, false_folder):
     #load the model
-    model = pickle.load(open(model_file, 'rb'))
+    #model = pickle.load(open(model_file, 'rb'))
 
 
-    true = []
+    true = {}
     #load true files
     for filename in os.listdir(true_folder):
         # Check if the current file is a regular file (not a directory)
@@ -244,17 +247,19 @@ def test_model(model_file, true_folder, false_folder):
             try:
             # Add the file name to the list
                 f = pd.read_csv(os.path.join(true_folder, filename))
+                print(f)
             #f = f.iloc[:,:].values
-                f = f.iloc[:, 1:].values
+                #f = f.iloc[:, 1:].values
                 pred = model.predict(f)[0]
 
-                true.append(pred)
+                #true.append(pred)
+                true[filename]= pred
 
-            except:pass
+            except Exception as e: print(e)
             #true.append(model.predict(np.array(data, dtype='int8')))
 
 
-    false = []
+    false = {}
     #load true files
     for filename in os.listdir(false_folder):
         # Check if the current file is a regular file (not a directory)
@@ -264,13 +269,14 @@ def test_model(model_file, true_folder, false_folder):
             # Add the file name to the list
                 f = pd.read_csv(os.path.join(false_folder, filename))
             #f = f.iloc[:,:].values
-                f = f.iloc[:, 1:].values
+                #f = f.iloc[:, 1:].values
 
                 pred = model.predict(f)[0]
 
-                false.append(pred)
+                #false.append(pred)
+                false[filename]=pred
 
-            except:pass
+            except Exception as e: print(e)
 
 
 
@@ -316,36 +322,48 @@ def run_tester(model_file):
 
 
 
-def remove_outliers(data_file):
-    from sklearn.neighbors import LocalOutlierFactor
+def remove_outliers(dt,outliers):
+    for o in outliers:
+        dt = dt.drop(o)
+
+    return dt
 
 
-    # Generate some sample data
-    # Add the file name to the list
-    X = pd.read_csv(data_file)
-    # f = f.iloc[:,:].values
-    X = X.iloc[0:199, 18:19].values
 
-    import seaborn
-    import matplotlib.pyplot as plt
-    seaborn.scatterplot(X)
-    plt.figure()
-    #plt.show()
-    s=seaborn.boxplot(X)
 
-    plt.show()
-    # Create the outlier detector
-    detector = LocalOutlierFactor(n_neighbors=3)
 
-    # Fit the detector and predict outliers
-    outliers = detector.fit_predict(X)
+def visualise(dt,gesture,graph_type = 'line', ):
 
-    # Remove outliers from the original data
-    X_clean = [X[i] for i, label in enumerate(outliers) if label != -1]
 
-    # Print the cleaned data
-    #print(X_clean)
+    dt1 = dt.loc[dt['gesture'] == gesture]
+    #
 
+    if graph_type=='line':
+        for col in dt1.columns:
+
+            dt_points = dt1[col]
+
+            try:
+                dt_points.plot(marker='o')
+
+            except Exception as e:
+                print(e)
+
+            else:
+                plt.title(label=col)
+                plt.show()
+
+    elif graph_type=='scatter':
+        import seaborn
+
+        for col in dt1.columns:
+            dt_points = dt1[col]
+            try:
+                seaborn.scatterplot(dt_points)
+            except Exception as e: print(e)
+            else:
+                plt.title(label=col)
+                plt.show()
 
 
 
@@ -354,23 +372,90 @@ def check():
 
 
 
+#this function takes the dates from the screenshots folder and sorts the recognition folder
+
+def sort_folders(ges_name):
+
+    import shutil
+    root = os.path.join(ROOTDIR,'datasets_old','datasets')
 
 
+    true_screenshots = os.listdir(os.path.join(root,'screenshots',ges_name,'true'))
+    false_screenshots = os.listdir(os.path.join(root, 'screenshots', ges_name, 'false'))
+
+    true_dates = [i[:11] for i in true_screenshots]
+    false_dates = [i[:11] for i in false_screenshots]
+
+    for file in os.listdir(os.path.join(root,ges_name,'recognitions')):
+        alt_file = file.replace('-', '_')
+        print(alt_file[:11])
+        if alt_file[:11] in true_dates:
+            shutil.move(os.path.join(root,ges_name,'recognitions',file),
+                        os.path.join(root,ges_name,'recognitions','true'))
+            print(f'{file} moved to true')
+
+        elif alt_file[:11] in false_dates:
+            shutil.move(os.path.join(root,ges_name,'recognitions',file),
+                        os.path.join(root,ges_name,'recognitions','false'))
+
+            print(f'{file} moved to false')
+
+
+
+#after saving data in an incorrect format i have written this func which chanf=ges that format into a proper dataframe
+#note that this func will DELETE the contents of the folder iyou provide but will use those conent to creat new files
+#must provide true folder or false folder
+#the wrong format was [  '[X.XXXX', 'XXXXX' ....... 'XXXXXX]' ]
+# the reuired format dataframe with the headers for columns, one index and float in each column
+def create_dataframe_from_wrong_format(folder):
+
+    headers = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
+                       'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13',
+                       'ring 13 -14',
+                       'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20',
+                       ]
+
+    import csv
+
+
+
+    for file in os.listdir(folder):
+        vals = []
+        dt = pd.read_csv(os.path.join(folder,file))
+        print(f'file name {file}')
+        # #print(dt.columns[1])
+        for id,col in enumerate(dt.columns):
+            if id ==0:
+                col = col[1:]
+
+            elif id ==len(dt.columns)-1:
+                col = col[:-1]
+
+
+            try:vals.append(float(col))
+            except: vals.append(float(col[:-2]))
+        print(vals)
+
+
+        with open(os.path.join(folder,file), 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            writer.writerow(vals)
 
 #files we are using test drink flash
 if __name__ == "__main__":
 
-    ges = 'flash'
-
-    file_name = os.path.join(ROOTDIR, 'datasets', ges, ges)
-
-    remove_outliers(file_name + '.csv')
-
-    #create_pipe(file_name, name='')
-
-    model_file = os.path.join(ROOTDIR, 'datasets', ges, ges + '_finalized_pipe_outliers.sav')
-    true_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'true' )
-    false_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'false')
+    # ges = 'flash'
+    #
+    # file_name = os.path.join(ROOTDIR, 'datasets', ges, ges)
+    #
+    # remove_outliers(file_name + '.csv')
+    #
+    # #create_pipe(file_name, name='')
+    #
+    # model_file = os.path.join(ROOTDIR, 'datasets', ges, ges + '_finalized_pipe_outliers.sav')
+    # true_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'true' )
+    # false_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'false')
 
 
     #create_model(file_name, name='outliers')
@@ -380,4 +465,35 @@ if __name__ == "__main__":
     #test_model(model_file, true_folder, false_folder)
     #
     #model_metric(model_file,file_name+'.csv','classification')
+
+    file = os.path.join(ROOTDIR,'datasets_old','datasets','flash','flash.csv')
+    dt = pd.read_csv(file)
+
+    outliers = [22,23,24,69,0,15,56,19,20,21,25,1,2,3,4,5,6,7,16,170,60,67]
+    outliers.append([i for i in range(142,149)])
+    outliers.append([i for i in range(190,194)])
+    outliers.append([i for i in range(159, 169)])
+    outliers.append([i for i in range(61, 66)])
+
+    #
+    dt_new = remove_outliers(dt,outliers)
+    #
+    # print(dt_new)
+    #
+    #visualise(dt_new, 'flash_start')
+
+    model = create_pipe(dt_new,save=False,)
+
+
+    #model_file = os.path.join(ROOTDIR,'datasets_old','datasets','flash', 'flash_finalized_model.sav' )
+    true_folder = os.path.join(ROOTDIR,'datasets_old','datasets','flash', 'recognitions', 'true')
+    false_folder = os.path.join(ROOTDIR, 'datasets_old', 'datasets', 'flash', 'recognitions', 'false')
+
+    #model = pickle.load(open(model_file, 'rb'))
+
+    test_model(model,true_folder,false_folder)
+
+
+
+
 
