@@ -471,6 +471,7 @@ class Movement(Gesture):
 
 
         result = self.model.predict(np.array([angles]))[0]
+        #print(result)
 
         if self.reverse_movement:
             s = '_end'
@@ -516,7 +517,7 @@ class Movement(Gesture):
 #call these functions to create a ne gestur/ movement
 # the func will collect angles from the webcam store them as csv and run the create pipe func from AI
 # with the csv
-def create_gesture(name, num_of_samples):
+def create_gesture(name, num_of_samples, n=5):
 
 
     new_ges = not(os.path.isdir(os.path.join(ROOTDIR,'datasets', str(name))))
@@ -544,7 +545,7 @@ def create_gesture(name, num_of_samples):
                 #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
                 if new_ges:
                     cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
-            done = ges.create_gesture(detector,num_of_samples=num_of_samples,new_ges=new_ges)
+            done = ges.create_gesture(detector,num_of_samples=num_of_samples,new_ges=new_ges,n=n)
 
 
 
@@ -557,7 +558,7 @@ def create_gesture(name, num_of_samples):
 
 
 #same as create gesture will collect start gesture then end gesture
-def create_movement(name, num_of_samples):
+def create_movement(name, num_of_samples,n=5):
 
     new_ges = not (os.path.isdir(os.path.join(ROOTDIR, 'datasets', str(name))))
     print(new_ges)
@@ -583,7 +584,7 @@ def create_movement(name, num_of_samples):
                 #cv2.imwrite(ROOTDIR + '/datasets/' + name + '/start_img.jpg', img)
                 if new_ges:
                     cv2.imwrite(os.path.join(ROOTDIR,'datasets',name,'start_img.jpg'), img)
-            done = ges.create_movement(detector,num_of_samples=num_of_samples, new_ges=new_ges)
+            done = ges.create_movement(detector,num_of_samples=num_of_samples, new_ges=new_ges,n=n)
 
 
 

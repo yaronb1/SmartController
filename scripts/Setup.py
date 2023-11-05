@@ -31,13 +31,14 @@ SCREENS= ['one', 'two']
 
 #if you are taking methods from the TuyaMethods modlue start the string with - tuya : 'tuya func args'
 GESTURES = [
-    ('thumbs up', 'tuya test hello', 'one')
+    ('thumbs_up2', 'tuya test hello', 'one')
             ]
 
 MOVEMENTS =[
 
 
-    ('gun2', 'tuya test hello', 'one')
+    ('gun2', 'tuya test hello', 'one'),
+    #('flash2', 'tuya test hello', 'one'),
     #     #('fan_right', lambda : print('snap'), 'one'),
     #     ('right_fan','tuya turn_off','one', 'reverse'), #all off
     #     ('right_fan', 'tuya turn_on', 'one'),#all on

@@ -4,13 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b7409c5f-64c7-4559-8c24-3800056652d4" name="Changes" comment="datasets">
-      <change beforePath="$PROJECT_DIR$/datasets/negatives/negatives.csv" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/negatives/negatives.csv" afterDir="false" />
+    <list default="true" id="b7409c5f-64c7-4559-8c24-3800056652d4" name="Changes" comment="angleschange">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/end_img.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/end_img.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/gun2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/gun2.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/gun2_finalized_pipe_.sav" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/gun2_finalized_pipe_.sav" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_06.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_09.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_11.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/gun2/start_img.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/start_img.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gun.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Ai_Data/AI.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Ai_Data/AI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/controllers/SmartController.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/controllers/SmartController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/detectors/Gestures.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/detectors/Gestures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/detectors/handLandmarks.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/detectors/handLandmarks.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +32,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="full-finger-angle" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -207,8 +219,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.Setup" />
-        <item itemvalue="Python.AI" />
         <item itemvalue="Python.Gestures" />
+        <item itemvalue="Python.AI" />
         <item itemvalue="Python.handLandmarks" />
         <item itemvalue="Python.DataVisualisation" />
       </list>
@@ -263,7 +275,15 @@
       <option name="project" value="LOCAL" />
       <updated>1698778951567</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="angleschange">
+      <option name="closed" value="true" />
+      <created>1699205548789</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1699205548796</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -271,7 +291,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="full-finger-angles" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -280,7 +312,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="new setup for adding gestures, amend gestures, tuya devices" />
     <MESSAGE value="datasets" />
-    <option name="LAST_COMMIT_MESSAGE" value="datasets" />
+    <MESSAGE value="angleschange" />
+    <option name="LAST_COMMIT_MESSAGE" value="angleschange" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

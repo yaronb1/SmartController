@@ -463,6 +463,8 @@ if __name__ == "__main__":
     file = os.path.join(ROOTDIR,'datasets',ges,ges+'.csv')
     dt = pd.read_csv(file)
 
+
+
     visualise(dt,gesture=ges, graph_type='scatter')
 
 
