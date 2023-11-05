@@ -37,7 +37,7 @@ GESTURES = [
 MOVEMENTS =[
 
 
-    ('gun', 'tuya test hello', 'one')
+    ('gun2', 'tuya test hello', 'one')
     #     #('fan_right', lambda : print('snap'), 'one'),
     #     ('right_fan','tuya turn_off','one', 'reverse'), #all off
     #     ('right_fan', 'tuya turn_on', 'one'),#all on

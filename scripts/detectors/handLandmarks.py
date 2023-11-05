@@ -289,7 +289,7 @@ class handDetector():
         ang2 = np.arctan2(*hp2[::-1])
         return np.rad2deg((ang1 - ang2))
 
-    def pointAngle(self, p1,p2, with_x_axis=True):
+    def pointAngle(self, p1,p2, with_x_axis=True,quads =True):
         #a = self.tipIds[finger]
 
         if self.hand == 'Right':
@@ -309,22 +309,25 @@ class handDetector():
             try:
                 angle = math.atan(y/x)
 
-                #first quad
-                if x>0 and y<0:
-                    angle = abs(angle)
+                if quads:
+                    #first quad
+                    if x>0 and y<0:
+                        angle = abs(angle)
 
-                #second quad
-                elif x<0 and y<0:
-                    angle = (-1*angle) + math.pi
+                    #second quad
+                    elif x<0 and y<0:
+                        angle = (-1*angle) + math.pi
 
-                #third quad
-                elif x<0 and y>0:
-                    angle = abs(angle) + math.pi
+                    #third quad
+                    elif x<0 and y>0:
+                        angle = abs(angle) + math.pi
 
 
-                #fourth quad
-                elif x>0 and y>0:
-                    angle = (-1*angle)+ math.pi*2
+                    #fourth quad
+                    elif x>0 and y>0:
+                        angle = (-1*angle)+ math.pi*2
+
+
 
             except: angle =-1
 
@@ -551,9 +554,9 @@ if __name__ == "__main__":
         img, lmListR, lmListL, handedness = detector.get_info(img)
 
 
-        if len(lmListL)>0:
+        if len(lmListR)>0:
 
-            p1,p2 = 8,6
+            p1,p2 = 5,8
 
             angle = detector.pointAngle(p1,p2)
 

@@ -16,11 +16,14 @@ import datetime
 #ROOTDIR = os.path.dirname(os.path.abspath(__file__))
 from definitions.config import ROOTDIR
 
-HEADERS = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
-           'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13',
-           'ring 13 -14',
-           'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20',
-           ]
+
+HEADERS = ['thumb', 'fore', 'middle','ring','pinky','gesture']
+
+# HEADERS = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
+#            'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13',
+#            'ring 13 -14',
+#            'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20',
+#            ]
 class Gesture():
     '''
     This class aims to capture a gesture made by the user, save it and then compare gestures captured from the webcam
@@ -104,11 +107,12 @@ class Gesture():
 
         else:
 
-            for i in range(20):
+            #for i in range(20):
+            for i in [1,5,9,13,17]:
                 if i == 0:
                     pass
                 else:
-                    angle = detector.pointAngle(i, i+1)  #
+                    angle = detector.pointAngle(i+1, i+3)  #
                     if angle == -1:
                         raise ValueError('angle error')
 
@@ -146,9 +150,12 @@ class Gesture():
 
     #creates a new file with the appropreate headers
     def create_new_file(self, headers = []):
-        default_headers = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
-                  'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13', 'ring 13 -14',
-                  'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20', 'gesture']
+        # default_headers = ['thumb 1-2', 'thumb 2-3', 'thumb 3-4', 'thumb_fore 4-5', 'fore 5-6', 'fore 6-7', 'fore 7-8',
+        #           'fore_middle 8-9', 'middle 9-10', 'middle 10-11', 'middle 11-12', 'middle_ring 12-13', 'ring 13 -14',
+        #           'ring 14-15', 'ring 15-16', 'ring_pinky 16-17', 'pinky 17-18', 'pinky 18-19', 'pinky 19-20', 'gesture']
+
+
+        default_headers = HEADERS
 
 
             #data_file = self.path + str(self.name) + '.csv'
@@ -628,10 +635,13 @@ def create_negatives(num_of_samples=1000):
 
 if __name__ == '__main__':
 
-    create_movement('tges', num_of_samples=5)
-    #ges = Movement(name='screw')
+    #create_movement('gun2', num_of_samples=100)
+    ges = Movement(name='gun2')
+    ges.train_model()
     # ges.copy_negatives()
     # ges.train_model()
+
+
 
 
 
