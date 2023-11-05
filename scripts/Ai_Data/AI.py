@@ -9,7 +9,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearRegression
 import pickle
 
 
@@ -38,7 +38,7 @@ def create_pipe(data, save=True, model_to_use='logistic regression',name='' ):
 
 
     # Pandas ".iloc" expects row_indexer, column_indexer
-    X = data.iloc[:, :-1]
+    X = data.iloc[:, :-1].values
     # Now let's tell the dataframe which column we want for the target/labels.
     y = data['gesture']
 
@@ -48,8 +48,19 @@ def create_pipe(data, save=True, model_to_use='logistic regression',name='' ):
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y,
                                                                                 test_size=0.20, )  # random_state=27)
 
+
+
+    weights = {
+
+        'nope':0.1,
+        name+'_start':1,
+        name+'_end':1,
+    }
+
+
+
     #RobustScaler(),QuantileTransformer(),KBinsDiscretizer(n_bins=5),
-    pipe = make_pipeline(Normalizer(),StandardScaler(), LogisticRegression(max_iter=1000,))
+    pipe = make_pipeline(Normalizer(),StandardScaler(), LogisticRegression(max_iter=1000,class_weight=weights))
 
 
 
@@ -60,7 +71,7 @@ def create_pipe(data, save=True, model_to_use='logistic regression',name='' ):
     model_prediction = pipe.predict(X_test)
 
     if save:
-        model_name = os.path.join(ROOTDIR,'datasets',name,'_finalized_pipe_.sav')
+        model_name = os.path.join(ROOTDIR,'datasets',name,name+'_finalized_pipe_.sav')
         #model_name = str(file_name) + '_finalized_pipe_'+ name +'.sav'
         pickle.dump(pipe, open(model_name, 'wb'))
 
@@ -278,67 +289,58 @@ def test_model(model, true_folder, false_folder):
 
             except Exception as e: print(e)
 
+    return false, true
 
-
-    #Tpredictions = model.predict(true)
-    #Fpredictions = model.predict(false)
 
     print(f'false recognitions {false}')
     print(f'true recognitions {true}')
 
 
 
-def run_tester(model_file):
-    model = pickle.load(open(model_file, 'rb'))
-    import cv2
-    import handLandmarks as hl
-    cap = cv2.VideoCapture(0)
-    detector = hl.handDetector()
-
-    ges = Gestures.Gesture(name='test')
-    ges.model = model
-    print(ges.model)
-
-    while True:
-        success, img = cap.read()
-        img = cv2.flip(img, 1)
-
-        img, lmListR, lmListL, handedness = detector.get_info(img)
-
-        if len(lmListR) >0 or len(lmListL)>0:
-            try:
-                angles = ges.create_angle_list(detector,-1)
-                result = ges.model.predict(np.array([angles]))[0]
-                if result !='nope':
-                    print(result)
-
-            except Exception as e: pass#print(e)
-
-        cv2.imshow('img', img)
-
-        if cv2.waitKey(1) & 0xFF==ord('q'):
-            cv2.destroyAllWindows()
-            break
 
 
+# pass dataframe and a list of outliers
+#return dt with the list remove
+#if no outliers gets passed the ufnc will remove based on the mean value
+def remove_outliers(dt,outliers=[],gesture='flash_start'):
 
-def remove_outliers(dt,outliers):
-    for o in outliers:
-        dt = dt.drop(o)
 
-    return dt
+    if len(outliers)!=0:
+        for o in outliers:
+            dt = dt.drop(o)
+
+        return dt
+
+    else:
+        for col in dt.columns:
+            if col=='gesture':
+                pass
+            else:
+                print(f'mean of {col} = {dt[col].mean()}')
+
+                dt1 = dt.loc[dt['gesture'] == gesture]
+                for val in dt1[col].values:
+                    print(val-dt1[col].mean())
+
+                break
 
 
 
 
 
+#creates graph of the dataset, showing the given gesture
+
+#when using line - gesture = 'ges'_start or 'ges'_end or nope
+#when using scatter ges = 'gesture'
 def visualise(dt,gesture,graph_type = 'line', ):
 
 
-    dt1 = dt.loc[dt['gesture'] == gesture]
+
     #
 
     if graph_type=='line':
+
+        dt1 = dt.loc[dt['gesture'] == gesture]
         for col in dt1.columns:
 
             dt_points = dt1[col]
@@ -356,10 +358,12 @@ def visualise(dt,gesture,graph_type = 'line', ):
     elif graph_type=='scatter':
         import seaborn
 
-        for col in dt1.columns:
-            dt_points = dt1[col]
+        for col in dt.columns:
+            dt_points = dt[col]
             try:
-                seaborn.scatterplot(dt_points)
+                seaborn.scatterplot(dt_points.loc[dt['gesture']=='nope'])
+                seaborn.scatterplot(dt_points.loc[dt['gesture'] == gesture +'_start'])
+                seaborn.scatterplot(dt_points.loc[dt['gesture'] == gesture + '_end'])
             except Exception as e: print(e)
             else:
                 plt.title(label=col)
@@ -445,17 +449,7 @@ def create_dataframe_from_wrong_format(folder):
 #files we are using test drink flash
 if __name__ == "__main__":
 
-    # ges = 'flash'
-    #
-    # file_name = os.path.join(ROOTDIR, 'datasets', ges, ges)
-    #
-    # remove_outliers(file_name + '.csv')
-    #
-    # #create_pipe(file_name, name='')
-    #
-    # model_file = os.path.join(ROOTDIR, 'datasets', ges, ges + '_finalized_pipe_outliers.sav')
-    # true_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'true' )
-    # false_folder = os.path.join(ROOTDIR, 'datasets', 'datasets', ges, 'recognitions', 'false')
+    ges = 'gun2'
 
 
     #create_model(file_name, name='outliers')
@@ -466,33 +460,52 @@ if __name__ == "__main__":
     #
     #model_metric(model_file,file_name+'.csv','classification')
 
-    file = os.path.join(ROOTDIR,'datasets_old','datasets','flash','flash.csv')
+    file = os.path.join(ROOTDIR,'datasets',ges,ges+'.csv')
     dt = pd.read_csv(file)
 
-    outliers = [22,23,24,69,0,15,56,19,20,21,25,1,2,3,4,5,6,7,16,170,60,67]
-    outliers.append([i for i in range(142,149)])
-    outliers.append([i for i in range(190,194)])
-    outliers.append([i for i in range(159, 169)])
-    outliers.append([i for i in range(61, 66)])
+    visualise(dt,gesture=ges, graph_type='scatter')
 
+
+    # outliers_end = [400,527,528,529,530,531,532,586,587,589,588,493,495,482]
+    # outliers_end.append([ior i in range(423, 430)])
+    # outliers_end.append([i for i in range(454, 461)])
     #
-    dt_new = remove_outliers(dt,outliers)
+    # #remove_outliers(dt)
     #
-    # print(dt_new)
+    # outliers = [22,23,24,69,0,15,56,19,20,21,25,1,2,3,4,5,6,7,16,170,60,67]
+    # outliers.append([i for i in range(142,149)])
+    # outliers.append([i for i in range(190,194)])
+    # outliers.append([i for i in range(159, 169)])
+    # outliers.append([i for i in range(61, 66)])
     #
-    #visualise(dt_new, 'flash_start')
+    # #
+    #dt_new = remove_outliers(dt,outliers_end)
 
-    model = create_pipe(dt_new,save=False,)
+    #dt_new = remove_outliers(dt,outliers)
+    # #
+    # # print(dt_new)
+    # #
+    #visualise(dt_new, 'flash_end')
+    #
 
-
-    #model_file = os.path.join(ROOTDIR,'datasets_old','datasets','flash', 'flash_finalized_model.sav' )
-    true_folder = os.path.join(ROOTDIR,'datasets_old','datasets','flash', 'recognitions', 'true')
-    false_folder = os.path.join(ROOTDIR, 'datasets_old', 'datasets', 'flash', 'recognitions', 'false')
-
-    #model = pickle.load(open(model_file, 'rb'))
-
-    test_model(model,true_folder,false_folder)
-
+    # model = create_pipe(dt,save=False, name=ges)
+    #
+    # # # #
+    # # # #
+    # model_file = os.path.join(ROOTDIR,'datasets_old','datasets',ges, ges+'_finalized_model.sav' )
+    # true_folder = os.path.join(ROOTDIR,'datasets_old','datasets',ges, 'recognitions', 'true')
+    # false_folder = os.path.join(ROOTDIR, 'datasets_old', 'datasets', ges, 'recognitions', 'false')
+    # #
+    # # # create_dataframe_from_wrong_format(true_folder)
+    # # # create_dataframe_from_wrong_format(false_folder)
+    # #
+    # # # # #
+    # # #model = pickle.load(open(model_file, 'rb'))
+    # # # #
+    # false, true = test_model(model,true_folder,false_folder)
+    #
+    # print(f'false -  {false.values()}')
+    # print(f'true - {true.values()}')
 
 
 

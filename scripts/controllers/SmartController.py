@@ -265,7 +265,7 @@ class Controller():
                 #print('fingers error')
                 try:
                     a = ges.check_ges(detector)
-                except:pass
+                except Exception as e:pass
                 else:
                     if a:
                         self.capture = ges.name
