@@ -1,0 +1,185 @@
+type: picture-elements
+image: local/images/Efrat_floor_plan/Dark.png
+elements:
+  - type: image
+    entity: switch.kitchen_switch_1
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Kitchen.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.living_couch2
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Couch_blue.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.living_room_open_b
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Open_m.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.bathroom
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Bathroom.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.bedroom
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Bedroom_main.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+      unavailable: local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: switch.pool_filter_socket_1
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Entrance_main.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.grass
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Grass.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.night_ligh
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Nightlight.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.grapes
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Plants.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: switch.shelves_socket_1
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Shelves.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: image
+    entity: light.swing
+    style:
+      top: 50%
+      left: 50%
+      width: 100%
+    state_image:
+      'on': local/images/Efrat_floor_plan/Swing.png
+      'off': local/images/Efrat_floor_plan/Transparent.png
+  - type: state-icon
+    entity: switch.kitchen_switch_1
+    tap_action:
+      action: toggle
+    style:
+      left: 65%
+      top: 70%
+      '--mdc-icon-size': 30px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.bathroom
+    tap_action:
+      action: toggle
+    style:
+      left: 37%
+      top: 70%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.bedroom
+    tap_action:
+      action: toggle
+    style:
+      left: 20%
+      top: 70%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.grass
+    tap_action:
+      action: toggle
+    style:
+      left: 85%
+      top: 70%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.grapes
+    tap_action:
+      action: toggle
+    style:
+      left: 85%
+      top: 20%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.swing
+    tap_action:
+      action: toggle
+    style:
+      left: 79%
+      top: 35%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: switch.pool_filter_socket_1
+    tap_action:
+      action: toggle
+    style:
+      left: 28%
+      top: 90%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: light.night_ligh
+    tap_action:
+      action: toggle
+    style:
+      left: 28%
+      top: 20%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+  - type: state-icon
+    entity: switch.shelves_socket_1
+    tap_action:
+      action: toggle
+    style:
+      left: 8%
+      top: 78%
+      '--mdc-icon-size': 25px
+      '--paper-item-icon-color': white
+

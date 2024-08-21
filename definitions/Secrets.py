@@ -1,0 +1,5 @@
+# docker laptop token
+docker_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxOGE1YWEzZjA2YzA0YTliOWE5NTA0NTU1YmJlZjMyYyIsImlhdCI6MTcxODU1NTIxNSwiZXhwIjoyMDMzOTE1MjE1fQ.5QsqNlY55sJvoTEe30v62t4rBctDnRUAaE7j0OaTpgY"
+
+# home instance on rpi token
+rpi_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyNmJmZTFkZDIxZmI0ZjFkYmNkYTZiOGZjNjU5YmFkYiIsImlhdCI6MTcxODcxMTQ4OCwiZXhwIjoyMDM0MDcxNDg4fQ.mw_-8N0P18bH-r2v2jdhae2R9U4VDJ9EAjWNUNP_XWI"

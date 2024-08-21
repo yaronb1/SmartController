@@ -5,10 +5,17 @@ Created on Tue Jan  4 11:35:13 2022
 
 @author: yaron
 """
+import random
 
 import cv2
 import mediapipe as mp
 import numpy as np
+
+
+features = {
+    'nose': [168,122,196,236,198,209,49,64,235,59,79,239,238,19,354,457,309,392,294,279,429,420,456,419,168],
+
+}
 
 class FaceDetector():
     def __init__(self, 
@@ -88,10 +95,16 @@ class FaceDetector():
                             
                     
         return self.lmList, bbox
-    
-    def getLips(self,img,colour=(255,255,255)):
+
+    #retrives the lips and coliurs them in
+    #isolat mode will get just the lips on a black bg
+    #coloyred will return the image with the coloured lips
+    def getLips(self,img,colour=(255,255,255), mode='isolate'):
         l=self.lmList
-        mask = np.zeros_like(img)
+        if mode =='isolate':
+            mask = np.zeros_like(img)
+        elif mode =='coloured':
+            mask = img.copy()
         if len(l)!=0:
             
             #mask.fill(255)
@@ -115,7 +128,31 @@ class FaceDetector():
                 [l[84][1], l[84][2]],
                 [l[181][1], l[181][2]],
                 [l[91][1], l[91][2]],
-                [l[146][1], l[146][2]]
+                [l[146][1], l[146][2]],
+
+                [l[78][1], l[78][2]],
+                [l[191][1], l[191][2]],
+                [l[80][1], l[80][2]],
+                [l[81][1], l[81][2]],
+                [l[82][1], l[82][2]],
+                [l[13][1], l[13][2]],
+                [l[312][1], l[312][2]],
+                [l[311][1], l[311][2]],
+                [l[310][1], l[310][2]],
+                [l[415][1], l[415][2]],
+
+                [l[306][1], l[306][2]],
+                #[l[323][1], l[323][2]],
+                [l[318][1], l[318][2]],
+                [l[402][1], l[402][2]],
+                [l[317][1], l[317][2]],
+                [l[14][1], l[14][2]],
+                [l[87][1], l[87][2]],
+                [l[178][1], l[178][2]],
+                [l[88][1], l[88][2]],
+                [l[95][1], l[95][2]],
+                [l[61][1], l[61][2]],
+
                 ])
             
             mask = cv2.fillPoly(mask, np.int32([points]), colour)
@@ -125,10 +162,113 @@ class FaceDetector():
             return lips
         
         else:return mask
+
+    def getEyes(self, img, colour=(255, 255, 255), mode='isolate', eye='both'):
+        l = self.lmList
+        if mode == 'isolate':
+            mask = np.zeros_like(img)
+        elif mode == 'coloured':
+            mask = img.copy()
+        if len(l) != 0:
+
+            # mask.fill(255)
+
+            pointsL = np.array([
+                [l[463][1], l[463][2]],
+                [l[398][1], l[398][2]],
+                [l[384][1], l[384][2]],
+                [l[385][1], l[385][2]],
+                # [l[37][1], l[27][2]],
+                [l[386][1], l[386][2]],
+                [l[387][1], l[387][2]],
+                [l[388][1], l[388][2]],
+                [l[466][1], l[466][2]],
+                [l[263][1], l[263][2]],
+                [l[249][1], l[249][2]],
+                [l[390][1], l[390][2]],
+                [l[373][1], l[373][2]],
+                [l[374][1], l[374][2]],
+                [l[380][1], l[380][2]],
+                [l[381][1], l[381][2]],
+                [l[382][1], l[382][2]],
+                [l[362][1], l[362][2]],
+            ])
+
+            pointsR = np.array([
+                [l[33][1], l[33][2]],
+                [l[246][1], l[246][2]],
+                [l[161][1], l[161][2]],
+                [l[160][1], l[160][2]],
+                # [l[37][1], l[27][2]],
+                [l[159][1], l[159][2]],
+                [l[158][1], l[158][2]],
+                [l[157][1], l[157][2]],
+                [l[173][1], l[173][2]],
+                [l[155][1], l[155][2]],
+                [l[154][1], l[154][2]],
+                [l[153][1], l[153][2]],
+                [l[145][1], l[145][2]],
+                [l[144][1], l[144][2]],
+                [l[163][1], l[163][2]],
+                [l[7][1], l[7][2]],
+
+            ])
+            if eye =='left':
+                mask = cv2.fillPoly(mask, np.int32([pointsL]), colour)
+
+            elif eye=='right':
+                mask = cv2.fillPoly(mask, np.int32([pointsR]), colour)
+
+            elif eye=='both':
+                mask = cv2.fillPoly(mask, np.int32([pointsR]), colour)
+                mask = cv2.fillPoly(mask, np.int32([pointsL]), colour)
+
+
+            # cv2.imshow("mask", mask)
+            lips = cv2.bitwise_and(img, mask)
+            return lips
+
+        else:
+            return mask
+
+
+    def get_feature(self,img, list, colour=(255, 255, 255), mode='isolate',):
+        l = self.lmList
+
+        if mode == 'isolate':
+            mask = np.zeros_like(img)
+        elif mode == 'coloured':
+            mask = img.copy()
+
+        if len(l) != 0:
+            # mask.fill(255)
+
+            pointsL = np.ndarray((len(list), 2))
+
+            for i, item in enumerate(list):
+                #pointsL.append([l[item][1], l[item][2]])
+                pointsL[i] =[l[item][1], l[item][2]]
+                # pointsL[i][1]  =
+
+            mask = cv2.fillPoly(mask, np.int32([pointsL]), colour)
+            lips = cv2.bitwise_and(img, mask)
+
+            return lips
+        else: return mask
+
+
     
 def main():
+    import os
+    from definitions.config import ROOTDIR
+    bg = cv2.imread(os.path.join(ROOTDIR,'images', 'cursor.png'))
+    bg = cv2.resize(bg,(20,20))
+
+    print(bg.shape)
+
+
     cap = cv2.VideoCapture(0)
-    
+    c = (0,255,0)
     faceDetector= FaceDetector()
     while True:
         success,img= cap.read()
@@ -137,19 +277,38 @@ def main():
         
         if len(lmList)!=0:
             
-            lips = faceDetector.getLips(img)
-            #lips = cv2.bitwise_and(img,lips)
-            
-            cv2.imshow("lips", lips)
+            lips = faceDetector.getLips(img, colour=c,mode='isolate')
+            eyes = faceDetector.getEyes(img, colour=c,mode='isolate')
+
+            nose = faceDetector.get_feature(img, features['nose'], mode ='isolate', colour = (0,255,0))
+
+            #img = cv2.bitwise_and(img,lips)
+            #lips = lips+img
+
+            aug_img = lips+eyes+nose
+            cv2.imshow("lips", aug_img)
+
+
             
 
+        #img = cv2.addWeighted(img,1,bg, 0.5, 0.0)
+        #print(img.shape)
         
         cv2.imshow("img", img)
+        key = cv2.waitKey(1)
+        if key==27:
+            c=(random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            print(c)
+
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
             #driver.close()
             break
+
         
 if __name__ == "__main__":
     main()
+
+

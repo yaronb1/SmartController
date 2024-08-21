@@ -5,18 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b7409c5f-64c7-4559-8c24-3800056652d4" name="Changes" comment="angleschange">
+      <change afterPath="$PROJECT_DIR$/scripts/controllers/HAController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SmartController.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SmartController.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/end_img.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/end_img.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/gun2.csv" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/gun2.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/gun2_finalized_pipe_.sav" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/gun2_finalized_pipe_.sav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_06.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_09.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/recognitions/05_Nov-19_11.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/gun2/start_img.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/gun2/start_img.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gun.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Ai_Data/AI.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Ai_Data/AI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/Setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/controllers/SmartController.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/controllers/SmartController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/controllers/Tuya.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/controllers/Tuya.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/detectors/FaceLandmarks.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/detectors/FaceLandmarks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/detectors/Gestures.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/detectors/Gestures.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,12 +60,29 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;last_opened_file_path&quot;: &quot;/home/yaron/PycharmProjects/SmartController/scripts/controllers&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;Python tests.AI.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.pytest in AI.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Cursor.executor&quot;: &quot;Run&quot;,
+    &quot;Python.DataVisualisation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.FaceLandmarks.executor&quot;: &quot;Run&quot;,
+    &quot;Python.FloorPlan.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GestureDetector.executor&quot;: &quot;Run&quot;,
+    &quot;Python.HAController.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SectionUI.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Setup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SkeletonGestures.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SmartController.executor&quot;: &quot;Run&quot;,
+    &quot;Python.UI.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/yaron/PycharmProjects/SmartController/images/icons&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/images/icons" />
+      <recent name="$PROJECT_DIR$/scripts/detectors" />
       <recent name="$PROJECT_DIR$/scripts/controllers" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -81,20 +92,21 @@
       <recent name="$PROJECT_DIR$/scripts/ui" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Setup">
-    <configuration name="AI" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.FloorPlan">
+    <configuration name="FloorPlan" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/UI" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/Ai_Data/AI.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/UI/FloorPlan.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -103,29 +115,9 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="DataVisualisation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="GestureDetector" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SmartController" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/Ai_Data" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/Ai_Data/DataVisualisation.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Gestures" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -136,7 +128,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/detectors/Gestures.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/detectors/GestureDetector.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -145,19 +137,20 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Setup" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="HAController" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/controllers" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/Setup.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/controllers/HAController.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -166,19 +159,20 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="handLandmarks" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="SectionUI" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/detectors" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/UI" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/detectors/handLandmarks.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/UI/SectionUI.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -189,6 +183,7 @@
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -208,23 +203,47 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="AI.py" type="tests" factoryName="py.test" temporary="true">
+      <module name="SmartController" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts/Ai_Data" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/scripts/Ai_Data/AI.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Python.FloorPlan" />
+      <item itemvalue="Python.GestureDetector" />
+      <item itemvalue="Python.HAController" />
+      <item itemvalue="Python.SectionUI" />
       <item itemvalue="Python.main" />
-      <item itemvalue="Python.handLandmarks" />
-      <item itemvalue="Python.AI" />
-      <item itemvalue="Python.DataVisualisation" />
-      <item itemvalue="Python.Gestures" />
-      <item itemvalue="Python.Setup" />
+      <item itemvalue="Python tests.AI.py" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Setup" />
-        <item itemvalue="Python.Gestures" />
-        <item itemvalue="Python.AI" />
-        <item itemvalue="Python.handLandmarks" />
-        <item itemvalue="Python.DataVisualisation" />
+        <item itemvalue="Python.FloorPlan" />
+        <item itemvalue="Python.HAController" />
+        <item itemvalue="Python.SectionUI" />
+        <item itemvalue="Python.GestureDetector" />
+        <item itemvalue="Python tests.AI.py" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-f5635417b835-31b6be0877a2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.18968.29" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -322,11 +341,6 @@
           <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/tinytuya/__init__.py</url>
           <line>91</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scripts/Ai_Data/AI.py</url>
-          <line>14</line>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

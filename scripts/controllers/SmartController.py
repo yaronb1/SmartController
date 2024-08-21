@@ -216,7 +216,7 @@ class Controller():
     '''    
     def run(self,args,detector, x=0, y=0,hover=False,fingers=[]):
 
-        if len(fingers) ==0:
+        if len(fingers) !=0:
             fingers = detector.fingerCounter()
 
         #print(fingers)
@@ -286,7 +286,10 @@ class Controller():
                     button.hover_over(args)
                 else:
                     try:button.func(button.args)
-                    except:button.func()
+                    except:
+                        #try: button.func(button.args[0])
+                        button.func()
+                        #except Exception as e: print(e)
 
         if 'canvas' in self.screen_dict:
             canvas = self.screen_dict['canvas']
@@ -997,11 +1000,24 @@ if __name__ == "__main__":
     #         cv2.destroyAllWindows()
     #         break
 
-    cap = cv2.VideoCapture(0)
-    success, img = cap.read()
 
-    cv2.imshow('bg', img)
-    cv2.waitKey(0)
+    from scripts.detectors import handLandmarks
+    screen = Screen(name='main')
+    b = Button(startX=0, startY=0, endX=100, endY=100, func=lambda: print('button pressed'))
+    screen.add_button(b)
+    c= Controller(view_webcam=True)
+
+    c.add_screen(screen)
+    detector = handLandmarks.handDetector()
+
+    cap = cv2.VideoCapture(0)
+
+
+
+    c.main(controllers={'cap':cap})
+
+
+
 
 
     

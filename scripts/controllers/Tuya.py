@@ -574,12 +574,23 @@ class LocalDevice(Controller):
 
 if __name__ == "__main__":
 
-    d = LocalDevice(
-    id= 'bfbf2f21a06fc00973hnrs',
-    ip= '192.168.43.156',
-    key= 'tC#01M!LV!$SaVBC',
-    version= 3.3,)
+    # d = LocalDevice(
+    # id= 'bfbf2f21a06fc00973hnrs',
+    # ip= '192.168.43.156',
+    # key= 'tC#01M!LV!$SaVBC',
+    # version= 3.3,)
+    #
+    # print (d.device.state())
 
-    print (d.device.state())
-    
-    
+
+    c = tinytuya.Cloud(
+        apiRegion="eu",
+        apiKey="uf9snq4abh36n6uvprts",
+        apiSecret="5f47cde0092c4ec59207fd6f1ba29208",
+        apiDeviceID="64560500ecfabc7b40e1")
+
+    result = c.getproperties('bf1dd94bf79c187862gzmh')
+
+    print(result)
+    # devices = c.getdevices()
+    # print(devices)

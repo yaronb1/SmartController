@@ -86,6 +86,8 @@ class Gesture():
 
         self.new=new
 
+
+
     #creates a list defining each angle between the point of the hand
     #list type will describe if the list is of the gesture, Not of the gesture, a list from the webcam which will be checked
     # list type = 1
@@ -510,6 +512,8 @@ class Movement(Gesture):
                 self.elapsed = 0
 
         return False
+
+
 
 
 
