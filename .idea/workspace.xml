@@ -57,7 +57,7 @@
     "Python.Cursor.executor": "Run",
     "Python.DataVisualisation.executor": "Run",
     "Python.FaceLandmarks.executor": "Run",
-    "Python.FloorPlan.executor": "Run",
+    "Python.FloorPlan.executor": "Debug",
     "Python.GestureDetector.executor": "Run",
     "Python.HAController.executor": "Run",
     "Python.SectionUI.executor": "Run",
